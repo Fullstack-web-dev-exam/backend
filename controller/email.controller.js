@@ -43,34 +43,33 @@ exports.sendPasswordResetEmail = async (req, res) => {
   sendEmail();
 };
 
-exports.recieveNewPassword = (req, res) => {
-  const {userId, token} = req.params;
-  const {password} = req.body;
+exports.recieveNewPassword = async (req, res) => {
+  try {
+    const {userId, token} = req.params;
+    const {password} = req.body;
 
-  UserModel.findOne({_id: userId})
-    .then(user => {
-      const secret = `${user.password}-${user.createdAt}`;
-      const payload = jwt.decode(token, secret);
-      if (payload.userId === user.id) {
-        bcrypt.genSalt(10, function (err, salt) {
-          if (err) return;
-          bcrypt.hash(password, salt, function (err, hash) {
+    await UserModel.findOne({_id: userId})
+      .then(user => {
+        const secret = `${user.password}-${user.createdAt}`;
+        const payload = jwt.decode(token, secret);
+        if (payload.userId === user.id) {
+          bcrypt.genSalt(10, function (err, salt) {
             if (err) return;
-            UserModel.findOneAndUpdate({_id: userId}, {password: hash}).then(
-              () => {
-                res
-                  .status(202)
-                  .json({message: 'Password changed accepted'})
-                  .catch(err => {
-                    res.status(500).json({message: err});
-                  });
-              }
-            );
+            bcrypt.hash(password, salt, function (err, hash) {
+              if (err) return;
+              UserModel.findOneAndUpdate({_id: userId}, {password: hash}).then(
+                () => {
+                  res.status(202).json({message: 'Password changed accepted'});
+                }
+              );
+            });
           });
-        });
-      }
-    })
-    .catch(() => {
-      res.status(404).json({message: 'invalid user'});
-    });
+        }
+      })
+      .catch(() => {
+        res.status(404).json({message: 'invalid user'});
+      });
+  } catch (error) {
+    throw new Error(error);
+  }
 };

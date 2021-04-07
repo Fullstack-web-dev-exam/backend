@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body style="text-align: center">
+    <h1>Reset password form</h1>
+    <form name="resetPassword" onsubmit="return getParams(this)">
+      <label for="password">
+        Password
+        <br />
+        <input type="password" name="password" id="password" required />
+      </label>
+      <br />
+      <br />
+      <label for="confirmPassword">
+        Confirm password
+        <br />
+        <input
+          type="password"
+          name="confirmPassword"
+          id="confirmPassword"
+          required
+        />
+      </label>
+      <br />
+      <button type="submit">Submit</button>
+    </form>
+    <script>
+      function getParams(form) {
+        const passwordField = document.forms.resetPassword.password.value;
+        const confirmPasswordField =
+          document.forms.resetPassword.confirmPassword.value;
+        if (passwordField !== confirmPasswordField) {
+          alert('Passwords are not matching');
+        } else {
+          form.action = window.location.pathname;
+          form.method = 'post';
+          return form;
+        }
+      }
+    </script>
+  </body>
+</html>
