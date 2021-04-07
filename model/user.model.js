@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const { Schema } = mongoose;
+const {Schema} = mongoose;
 const bcrypt = require('bcrypt');
 
 const UserSchema = new Schema(
@@ -17,21 +17,21 @@ const UserSchema = new Schema(
       type: 'string',
       require: true,
       enum: ['manager', 'gardener'],
-      default: 'gardener'
+      default: 'gardener',
     },
     email: {
       type: 'string',
       require: true,
       unique: true,
       trim: true,
-      lowercase: true
+      lowercase: true,
     },
     password: {
       type: 'string',
       require: true,
     },
   },
-  { timestamps: true }
+  {timestamps: true}
 );
 
 UserSchema.pre('save', async function (next) {
