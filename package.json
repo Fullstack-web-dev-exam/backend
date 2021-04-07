@@ -1,0 +1,24 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "Backend code for our exam",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Fullstack-web-dev-exam/backend.git"
+  },
+  "keywords": [
+    "NTNU",
+    "exam",
+    "backend"
+  ],
+  "author": "Glenn Hansen, Tom Schrier, Cornelius Sandmæl",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Fullstack-web-dev-exam/backend/issues"
+  },
+  "homepage": "https://github.com/Fullstack-web-dev-exam/backend#readme"
+}
