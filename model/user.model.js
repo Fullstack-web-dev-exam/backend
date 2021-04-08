@@ -8,12 +8,12 @@ const UserSchema = new Schema(
     name: {
       type: 'string',
       require: true,
-      trim: true
+      trim: true,
     },
     surname: {
       type: 'string',
       require: true,
-      trim: true
+      trim: true,
     },
     role: {
       type: 'string',
