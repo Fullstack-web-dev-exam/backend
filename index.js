@@ -23,7 +23,6 @@ app.use(express.urlencoded({extended: true}));
 app.use(cors());
 // Easier to see what requests are sent via postman
 app.use(morgan('dev'));
-app.use(express.static('./public/'));
 // Authenticate user
 const authUser = passport.authenticate('jwt', {session: false});
 
