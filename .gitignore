@@ -165,7 +165,3 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
-
-# Other
-.env
-.ENV
