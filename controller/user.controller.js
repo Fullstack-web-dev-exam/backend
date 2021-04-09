@@ -65,7 +65,7 @@ exports.createUser = async function (req, res, next) {
         }
       });
     } else {
-      res.send({message: 'Unauthorized'});
+      res.status(401).send({message: 'Unauthorized'});
     }
   } catch (error) {
     next(error);
