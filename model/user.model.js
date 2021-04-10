@@ -5,51 +5,81 @@ const bcrypt = require('bcrypt');
 
 const UserSchema = new Schema(
   {
-    name: {
-      type: 'string',
-      require: true,
-      trim: true,
+    methods: {
+      type: [String],
+      required: true,
     },
-    surname: {
-      type: 'string',
-      require: true,
-      trim: true,
-    },
-    role: {
-      type: 'string',
-      require: true,
-      enum: ['manager', 'gardener'],
-      default: 'gardener',
-    },
-    email: {
-      type: 'string',
-      require: true,
-      unique: true,
-      trim: true,
-      lowercase: true,
-    },
-    password: {
-      type: 'string',
-      require: true,
+    local: {
+      name: {
+        type: 'string',
+        require: true,
+        trim: true,
+      },
+      surname: {
+        type: 'string',
+        require: true,
+        trim: true,
+      },
+      role: {
+        type: 'string',
+        require: true,
+        enum: ['manager', 'gardener'],
+        default: 'gardener',
+      },
+      email: {
+        type: 'string',
+        require: true,
+        unique: true,
+        trim: true,
+        lowercase: true,
+      },
+      password: {
+        type: 'string',
+        require: true,
+      },
     },
   },
   {timestamps: true}
 );
 
 UserSchema.pre('save', async function (next) {
-  // Hashes password 10 rounds
-  const hash = await bcrypt.hash(this.password, 10);
+  try {
+    console.log('entrered');
 
-  this.password = hash;
-  next();
+    if (!this.methods.includes('local')) {
+      next();
+    }
+
+    // Instansiate userSchema
+    const user = this;
+
+    // Check if user has been pmodified to know if the password has already been hashed
+    if (!user.isModified('local.password')) {
+      next();
+    }
+
+    // generate a salt
+    const salt = await bcrypt.salt(10);
+    // generate a password hash (salt + hash)
+    const passwordHash = await bcrypt.hash(this.local.password, salt);
+    // Re-assign hashed version over original, plain text password
+    this.local.password = passwordHash;
+    next();
+  } catch (error) {
+    next(error);
+  }
 });
 
-UserSchema.methods.isValidPassword = async function (password) {
-  const user = this;
-  const compare = await bcrypt.compare(password, user.password);
-
-  return compare;
+UserSchema.methods.isValidPassword = async function (newPassword) {
+  try {
+    return await bcrypt.compare(newPassword, this.local.password);
+  } catch (error) {
+    throw new Error(error);
+  }
 };
 
+// Create a model
 const UserModel = mongoose.model('User', UserSchema);
+
+// Export model
 module.exports = UserModel;

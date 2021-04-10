@@ -3,9 +3,19 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 const cors = require('cors');
 const morgan = require('morgan');
+const cookieParser = require('cookie-parser');
 require('dotenv').config();
 
 const app = express();
+
+// Cookies
+app.use(cookieParser());
+// Easier to see what requests are sent via postman
+app.use(morgan('dev'));
+// parse request of content-type - application/json
+app.use(express.json());
+// parse request of content-type - application/x-www-form-urlencoded
+app.use(express.urlencoded({extended: true}));
 require('./auth/user.auth');
 
 // Route handlers
@@ -15,14 +25,13 @@ const dashboardRoute = require('./routes/dashboard.routes');
 const resetRoute = require('./routes/email.routes');
 // Middlewares
 
-// parse request of content-type - application/json
-app.use(express.json());
-// parse request of content-type - application/x-www-form-urlencoded
-app.use(express.urlencoded({extended: true}));
 // Not whitelisted atm, this is for development purposes
-app.use(cors());
-// Easier to see what requests are sent via postman
-app.use(morgan('dev'));
+app.use(
+  cors({
+    origin: 'http://localhost:3000',
+    credentials: true,
+  })
+);
 // Authenticate user
 const authUser = passport.authenticate('jwt', {session: false});
 
@@ -55,7 +64,7 @@ mongoose
   });
 
 // Handle errors.
-app.use((err, req, res, next) => {
+app.use((err, res) => {
   res.status(err.status || 500);
   res.json({error: err});
 });

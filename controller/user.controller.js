@@ -1,4 +1,17 @@
+const JWT = require('jsonwebtoken');
 const UserModel = require('../model/user.model');
+require('dotenv').config();
+
+const signToken = user =>
+  JWT.sign(
+    {
+      iss: 'CodeWorkr',
+      sub: user.id,
+      iat: new Date().getTime(),
+      exp: new Date().setDate(new Date().getDate() + 1), // Current time + 1 day
+    },
+    process.env.TOKEN_SECRET
+  );
 
 // Get user information based on role
 // Gardeners and Managers can get their on information (not password and id)
@@ -31,45 +44,68 @@ exports.getUser = function (req, res, next) {
 
 exports.createUser = async function (req, res, next) {
   try {
-    if (req.user.role === 'manager') {
-      const {name, surname, role, email, password} = req.body;
-      // validate field
-      if (!name || !surname || !role || !email || !password) {
-        res.status(400).send({
-          message: 'name, surname, role, email and password is required',
-        });
-      }
-
-      const user = new UserModel({
-        name: req.body.name,
-        surname: req.body.surname,
-        role: req.body.role,
-        email: req.body.email,
-        password: req.body.password,
-      });
-
-      await UserModel.exists({user}).then(data => {
-        if (data) {
-          res.status(400).send({message: 'User already exists'});
-        } else {
-          user
-            .save(user)
-            .then(resData => {
-              res.send(resData);
-            })
-            .catch(err => {
-              res.status(500).send({
-                message: err.message || 'Some error occured while saving user',
-              });
-            });
-        }
-      });
-    } else {
+    if (req.user.role !== 'manager') {
       res.send({message: 'Unauthorized'});
+      next();
     }
+
+    const {name, surname, role, email, password} = req.body;
+    // validate field
+    if (!name || !surname || !role || !email || !password) {
+      res.status(400).send({
+        message: 'name, surname, role, email and password is required',
+      });
+      next();
+    }
+
+    const user = new UserModel({
+      name: req.body.name,
+      surname: req.body.surname,
+      role: req.body.role,
+      email: req.body.email,
+      password: req.body.password,
+    });
+
+    console.log(user);
+
+    await UserModel.exists({user}).then(data => {
+      if (data) {
+        res.status(403).send({message: 'User with email already exists'});
+      } else {
+        user
+          .save(user)
+          .then(resData => {
+            // Generate token
+            const token = signToken(resData);
+            // Respond with token
+            res.cookie('access_token', token, {
+              httpOnly: true,
+            });
+
+            res.status(200).json({success: true});
+          })
+          .catch(err => {
+            res.status(500).send({
+              message: err.message || 'Some error occured while saving user',
+            });
+          });
+      }
+    });
   } catch (error) {
     next(error);
   }
+};
+
+exports.signIn = async function (req, res, next) {
+  console.log('test');
+  console.log(req.user);
+  // Generate token
+  const token = signToken(req.user);
+  console.log(token);
+  res.cookie('access_token', token, {
+    httpOnly: true,
+  });
+  res.status(200).json({success: true});
 };
 
 // Manager can only delete users
