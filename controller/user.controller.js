@@ -120,10 +120,10 @@ exports.getAllUsers = function (req, res, next) {
 // Manager can update user information (not id, password)
 // Gardeners can update user information (not id, email, password)
 
-exports.updateUser = (req, res, next) => {
-  const {email} = req.body;
-  const {password} = req.body;
+exports.updateUser = async (req, res, next) => {
   try {
+    const {password} = req.body;
+    const currentUser = req.user.email;
     if (req.user.role === 'manager') {
       // update a user by its email
       if (!req.body)
@@ -135,29 +135,37 @@ exports.updateUser = (req, res, next) => {
         return res.status(400).send({message: 'Cannot update password'});
 
       // Update user based on email
-      UserModel.findOneAndUpdate(email, req.body, {
+      await UserModel.findOneAndUpdate({email: currentUser}, req.body, {
         useFindAndModify: false,
       }).then(data => {
         if (!data) {
           res.status(404).send({
-            message: `Cannot update user with email=${email}. Maybe the user was not found`,
+            message: `Cannot update user with email=${currentUser}. Maybe the user was not found`,
           });
+        } else {
+          const {name, surname} = data;
+          res.status(200).send({name, surname});
         }
       });
     } else if (req.user.role === 'gardener') {
-      if (password || email)
+      const {password} = req.body;
+      const currentUser = req.user.email;
+
+      if (req.body.email)
         return res
           .status(400)
           .send({message: 'Cannot update password or email'});
 
       // Update user based on email
-      UserModel.findOneAndUpdate(email, req.body, {
+      await UserModel.findOneAndUpdate({email: currentUser}, req.body, {
         useFindAndModify: false,
       }).then(data => {
         if (!data) {
           res.status(404).send({
-            message: `Cannot update user with email=${email}. Maybe the user was not found`,
+            message: `Cannot update user with email=${currentUser}. Maybe the user was not found`,
           });
+        } else {
+          res.status(200).send({data});
         }
       });
     }

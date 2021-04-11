@@ -17,7 +17,6 @@ const UsePasswordHashToMakeToken = ({
   const token = jwt.sign({userId}, secret, {
     expiresIn: 3600, // 1 hour
   });
-
   return token;
 };
 

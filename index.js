@@ -31,7 +31,7 @@ const hasRole = require('./middleware/role.middleware');
 app.use('/', generalRoute);
 app.use('/user', authUser, hasRole.User, userRoute);
 app.use('/dashboard', authUser, hasRole.Manager, dashboardRoute);
-app.use('/reset_password', resetRoute);
+app.use('/forgotpassword', resetRoute);
 
 // Database
 mongoose
