@@ -120,9 +120,10 @@ exports.getAllUsers = function (req, res, next) {
 // Manager can update user information (not id, password)
 // Gardeners can update user information (not id, email, password)
 
-exports.updateUser = (req, res, next) => {
-  const {email} = req.body;
+exports.updateUser = async (req, res, next) => {
+  const userEmail = req.body.email;
   const {password} = req.body;
+  const currentUser = req.user.email;
   try {
     if (req.user.role === 'manager') {
       // update a user by its email
@@ -135,29 +136,33 @@ exports.updateUser = (req, res, next) => {
         return res.status(400).send({message: 'Cannot update password'});
 
       // Update user based on email
-      UserModel.findOneAndUpdate(email, req.body, {
+      await UserModel.findOneAndUpdate({email: currentUser}, req.body, {
         useFindAndModify: false,
       }).then(data => {
         if (!data) {
           res.status(404).send({
-            message: `Cannot update user with email=${email}. Maybe the user was not found`,
+            message: `Cannot update user with email=${currentUser}. Maybe the user was not found`,
           });
+        } else {
+          res.status(200).send({data});
         }
       });
     } else if (req.user.role === 'gardener') {
-      if (password || email)
+      if (currentUser)
         return res
           .status(400)
           .send({message: 'Cannot update password or email'});
 
       // Update user based on email
-      UserModel.findOneAndUpdate(email, req.body, {
+      await UserModel.findOneAndUpdate({email: currentUser}, req.body, {
         useFindAndModify: false,
       }).then(data => {
         if (!data) {
           res.status(404).send({
-            message: `Cannot update user with email=${email}. Maybe the user was not found`,
+            message: `Cannot update user with email=${currentUser}. Maybe the user was not found`,
           });
+        } else {
+          res.status(200).send({data});
         }
       });
     }
