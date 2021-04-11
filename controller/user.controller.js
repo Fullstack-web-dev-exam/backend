@@ -152,6 +152,8 @@ exports.updateUser = async (req, res, next) => {
       const currentUser = req.user.email;
 
       if (req.body.email)
+      if (password || email)
+      if (currentUser)
         return res
           .status(400)
           .send({message: 'Cannot update password or email'});
