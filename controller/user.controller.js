@@ -77,17 +77,18 @@ exports.createUser = async function (req, res, next) {
 
 exports.deleteUser = function (req, res, next) {
   try {
-    const {email} = req.params;
+    const currentUser = req.body.email;
     if (req.user.role === 'manager') {
-      UserModel.findOneAndDelete(email).then(data => {
+      console.log(currentUser);
+      UserModel.findOneAndDelete({email: currentUser}).then(data => {
         if (!data) {
           return res
             .status(400)
-            .send({message: `User with email=${email} was not found`});
+            .send({message: `User with email=${currentUser} was not found`});
         }
-        res
-          .status(200)
-          .send({message: `User with email=${email} was deleted successfully`});
+        res.status(200).send({
+          message: `User with email=${currentUser} was deleted successfully`,
+        });
       });
     }
   } catch (error) {
