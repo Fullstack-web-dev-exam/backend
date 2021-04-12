@@ -22,7 +22,7 @@ const UsePasswordHashToMakeToken = ({
 };
 
 exports.sendPasswordResetEmail = async (req, res) => {
-  const {email} = req.params;
+  const {email} = req.body;
   let user;
   try {
     user = await UserModel.findOne({email}).exec();
