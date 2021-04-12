@@ -150,7 +150,7 @@ exports.updateUser = async (req, res, next) => {
         }
       });
     } else {
-      if (currentUser)
+      if (req.body.email)
         return res
           .status(400)
           .send({message: 'Cannot update password or email'});
