@@ -122,11 +122,12 @@ exports.getAllUsers = function (req, res, next) {
 // Gardeners can update user information (not id, email, password)
 
 exports.updateUser = async (req, res, next) => {
-  const userEmail = req.body.email;
+  const userEmail = req.body.selectedUser;
   const {password} = req.body;
   const currentUser = req.user.email;
+  console.log(req.body);
   try {
-    if (req.user.role === 'manager') {
+    if (req.body.place === 'dashboard') {
       // update a user by its email
       if (!req.body)
         return res
@@ -137,18 +138,18 @@ exports.updateUser = async (req, res, next) => {
         return res.status(400).send({message: 'Cannot update password'});
 
       // Update user based on email
-      await UserModel.findOneAndUpdate({email: currentUser}, req.body, {
+      await UserModel.findOneAndUpdate({email: userEmail}, req.body, {
         useFindAndModify: false,
       }).then(data => {
         if (!data) {
           res.status(404).send({
-            message: `Cannot update user with email=${currentUser}. Maybe the user was not found`,
+            message: `Cannot update user with email=${userEmail}. Maybe the user was not found`,
           });
         } else {
           res.status(200).send({data});
         }
       });
-    } else if (req.user.role === 'gardener') {
+    } else {
       if (currentUser)
         return res
           .status(400)
