@@ -49,7 +49,7 @@ passport.use(
       try {
         const user = await UserModel.findOne({email});
 
-        if (!user) return done(null, false, {message: 'User not found'});
+        if (!user) return done(null, false, {message: 'Wrong username and/or password'});
 
         const validate = await user.isValidPassword(password);
 
