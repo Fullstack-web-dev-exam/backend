@@ -1,20 +1,43 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const passport = require('passport');
 const cors = require('cors');
 const morgan = require('morgan');
+const cookieParser = require('cookie-parser');
+const swaggerJsDoc = require('swagger-jsdoc');
+const swaggerUI = require('swagger-ui-express');
+// const options = require('./swagger.yaml')
 require('dotenv').config();
+
+const options = {
+  definition: {
+    openapi: '3.0.3',
+    info: {
+      title: 'fullstack-exam',
+      version: '1.0.0',
+      description: 'A simple fullstack exam',
+    },
+    servers: [
+      {
+        url: 'https://locahost:5000',
+      },
+    ],
+  },
+  apis: ['./routes/*.js'],
+};
+
+const specs = swaggerJsDoc(options);
 
 const app = express();
 require('./auth/user.auth');
 
 // Route handlers
-const generalRoute = require('./routes/routes');
-const userRoute = require('./routes/user.routes');
+const generalRoute = require('./routes/auth.routes');
+const profileRoute = require('./routes/profile.routes');
 const dashboardRoute = require('./routes/dashboard.routes');
-const resetRoute = require('./routes/email.routes');
-// Middlewares
+const forgotPasswordRoute = require('./routes/email.routes');
 
+// Middlewares
+app.use(cookieParser());
 // parse request of content-type - application/json
 app.use(express.json());
 // parse request of content-type - application/x-www-form-urlencoded
@@ -23,15 +46,18 @@ app.use(express.urlencoded({extended: true}));
 app.use(cors());
 // Easier to see what requests are sent via postman
 app.use(morgan('dev'));
-// Authenticate user
-const authUser = passport.authenticate('jwt', {session: false});
 
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(specs));
+// Authenticate user
+// const authUser = passport.authenticate('jwt', {session: false});
 const hasRole = require('./middleware/role.middleware');
 
 app.use('/', generalRoute);
-app.use('/user', authUser, hasRole.User, userRoute);
-app.use('/dashboard', authUser, hasRole.Manager, dashboardRoute);
-app.use('/forgotpassword', resetRoute);
+// app.use('/profile', profileRoute)
+app.use('/profile', hasRole.User, profileRoute);
+// app.use('/dashboard', authUser, hasRole.Manager, dashboardRoute);
+app.use('/dashboard', dashboardRoute);
+app.use('/forgotpassword', forgotPasswordRoute);
 
 // Database
 mongoose
@@ -56,6 +82,6 @@ mongoose
 
 // Handle errors.
 app.use((err, req, res, next) => {
-  res.status(err.status || 500);
+  res.status(err.status || err);
   res.json({error: err});
 });

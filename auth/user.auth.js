@@ -7,37 +7,48 @@ const ExtractJWT = require('passport-jwt').ExtractJwt;
 
 const UserModel = require('../model/user.model');
 
+const cookieExtractor = req => {
+  let token = null;
+  if (req && req.cookies) {
+    token = req.cookies.access_token;
+  }
+  return token;
+};
+
+
 require('dotenv').config();
 
-// Only going to be used for testing purposes
+
+// JSON WEB TOKEN STRATEGY
 passport.use(
-  'signup',
-  new LocalStrategy(
+  new JWTstrategy(
     {
-      usernameField: 'email',
-      passwordField: 'password',
+      jwtFromRequest: cookieExtractor,
+      secretOrKey: process.env.TOKEN_SECRET,
       passReqToCallback: true,
     },
-    async (req, email, password, done) => {
+    async (req, payload, done) => {
       try {
-        const {name, surname, role, place, status} = req.body;
-        const user = await UserModel.create({
-          name,
-          surname,
-          email,
-          role,
-          password,
-          place,
-          status,
-        });
-        return done(null, user);
+        // Find user specified in token
+				console.log(payload)
+        const user = await UserModel.findById(payload.sub);
+				console.log(user)
+				// console.log(user)
+        // if user doesn't exist, handle it
+        if (!user) {
+          return done(null, false);
+        }
+
+        // Otherwise return user
+        req.user = user;
+				console.log(user)
+        done(null, user);
       } catch (error) {
-        done(error);
+        done(error, false);
       }
     }
   )
 );
-
 passport.use(
   'login',
   new LocalStrategy(
@@ -47,7 +58,7 @@ passport.use(
     },
     async (email, password, done) => {
       try {
-        const user = await UserModel.findOne({email});
+				const user = await UserModel.findOne({'email': email});
 
         if (!user) return done(null, false, {message: 'User not found'});
 
@@ -64,18 +75,18 @@ passport.use(
   )
 );
 
-passport.use(
-  new JWTstrategy(
-    {
-      secretOrKey: process.env.TOKEN_SECRET,
-      jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
-    },
-    async (token, done) => {
-      try {
-        return done(null, token.user);
-      } catch (error) {
-        done(error);
-      }
-    }
-  )
-);
+// passport.use(
+//   new JWTstrategy(
+//     {
+//       secretOrKey: process.env.TOKEN_SECRET,
+//       jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
+//     },
+//     async (token, done) => {
+//       try {
+//         return done(null, token.user);
+//       } catch (error) {
+//         done(error);
+//       }
+//     }
+//   )
+// );
