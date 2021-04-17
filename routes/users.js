@@ -5,7 +5,7 @@ const router = express.Router();
 const authorize = require('../middleware/authorize');
 
 const Role = require('helpers/role');
-const {authenticate, authenticateSchema, createSchema, create, revokeTokenSchema, revokeToken, refreshToken} = require('../controllers/user');
+const {authenticate, authenticateSchema, createSchema, create, revokeTokenSchema, revokeToken, refreshToken} = require('../controllers/auth');
 
 const User = require('../models/User');
 

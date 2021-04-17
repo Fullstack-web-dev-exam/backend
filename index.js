@@ -16,7 +16,7 @@ const dashboardRoute = require('./routes/dashboard.routes');
 const resetRoute = require('./routes/email.routes');
 
 // Import controllers
-const userController = require('./controllers/user');
+const userController = require('./controllers/auth');
 
 // Middlewares
 
