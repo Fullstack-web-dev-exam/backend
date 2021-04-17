@@ -1,24 +1,14 @@
 // Node modules
-const Joi = require('joi');
 const jwt = require('jsonwebtoken');
-const express = require('express');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 
 // Local files
 const RefreshToken = require('../models/RefreshToken');
-const validateRequest = require('../middleware/validate-request');
-const authorize = require('../middleware/authorize');
 const Role = require('../helpers/role');
 const User = require('../models/User');
 
-const router = express.Router();
-
-/**
- * POST: User Register
- * req.body = email, password, role
- */
-router.post('/register', createSchema, async (req, res, next) => {
+exports.register = async (req, res, next) => {
   const userDetails = req.body;
 
   // Check if user already exists
@@ -37,15 +27,13 @@ router.post('/register', createSchema, async (req, res, next) => {
     const savedUser = await user.save();
     res.status(200).json({ message: 'User registered successfully!', savedUser })
   } catch (error) {
+    console.log(error);
     next(error);
   }
-});
+}
 
-/**
- * POST: User Login
- * req.body = email, password
- */
-router.post('/login', authenticateSchema, async (req, res, next) => {
+
+exports.login = async (req, res, next) => {
   const { email, password } = req.body;
   const ipAddress = req.ip;
 
@@ -74,13 +62,9 @@ router.post('/login', authenticateSchema, async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-});
+}
 
-/**
- * POST: Revoke token
- * req.cookies = refreshToken || req.body = token
- */
-router.post('/revoke-token', authorize(), revokeTokenSchema, async (req, res, next) => {
+exports.revokeToken = async (req, res, next) => {
   // Accept token from request body or cookie
   const token = req.body.token || req.cookies.refreshToken;
   const ipAddress = req.ip;
@@ -107,13 +91,10 @@ router.post('/revoke-token', authorize(), revokeTokenSchema, async (req, res, ne
     console.log(error);
     next(error);
   }
-});
+}
 
-/**
- * POST: Refresh Token
- * req.cookies = refreshToken || req.body = token
- */
-router.post('/refresh-token', async (req, res, next) => {
+
+exports.refreshToken = async (req, res, next) => {
   const token = req.body.token || req.cookies.refreshToken;
   const ipAddress = req.ip;
 
@@ -142,33 +123,9 @@ router.post('/refresh-token', async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-});
+}
 
 // TODO: Remember to create validateRequest
-
-function createSchema(req, res, next) {
-  const schema = Joi.object({
-    email: Joi.string().email().required(),
-    password: Joi.string().required(),
-    role: Joi.string().valid(Role.Manager, Role.Gardener).required()
-  });
-  validateRequest(req, next, schema);
-}
-
-function authenticateSchema(req, res, next) {
-  const schema = Joi.object({
-    email: Joi.string().required(),
-    password: Joi.string().required(),
-  });
-  validateRequest(req, next, schema);
-}
-
-function revokeTokenSchema(req, res, next) {
-  const schema = Joi.object({
-    token: Joi.string().empty(''),
-  });
-  validateRequest(req, next, schema);
-}
 
 // helper functions
 function setTokenCookie(res, token) {
@@ -211,5 +168,3 @@ function basicDetails(user) {
   const { id, name, surname, email, role, created, updated, isVerified } = user;
   return { id, name, surname, email, role, created, updated, isVerified };
 }
-
-module.exports = router;
