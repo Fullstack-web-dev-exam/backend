@@ -10,13 +10,10 @@ const morgan = require('morgan');
 const app = express();
 
 // Route handlers
-const generalRoute = require('./routes/routes');
 const userRoute = require('./routes/user.routes');
 const dashboardRoute = require('./routes/dashboard.routes');
 const resetRoute = require('./routes/email.routes');
-
-// Import controllers
-const userController = require('./controllers/auth');
+const authRoute = require('./routes/auth.routes');
 
 // Middlewares
 
@@ -33,11 +30,10 @@ const authUser = passport.authenticate('jwt', { session: false });
 
 const hasRole = require('./middleware/role.middleware');
 
-app.use('/', generalRoute);
 app.use('/user', authUser, hasRole.User, userRoute);
 app.use('/dashboard', authUser, hasRole.Manager, dashboardRoute);
 app.use('/reset_password', resetRoute);
-app.use('/authenticate', userController);
+app.use('/authenticate', authRoute);
 
 // Connect to DB
 mongoose.connect(

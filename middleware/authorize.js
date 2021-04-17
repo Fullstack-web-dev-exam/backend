@@ -14,7 +14,7 @@ function authorize(roles = []) {
     jwt({secret, algorithms: ['HS256']}),
 
     async (req, res, next) => {
-      const user = await User.findById(req.user.id);
+      const user = await User.findById(req.user._id);
       const refreshToken = await RefreshToken.find({user: user.id});
 
       if (!user || (roles.length && !roles.includes(user.role))) {
