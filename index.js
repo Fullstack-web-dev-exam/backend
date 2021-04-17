@@ -20,7 +20,15 @@ app.use(express.json());
 // parse request of content-type - application/x-www-form-urlencoded
 app.use(express.urlencoded({extended: true}));
 // Not whitelisted atm, this is for development purposes
-app.use(cors());
+if (
+  process.env &&
+  process.env.NODE_ENV &&
+  process.env.NODE_ENV === 'production'
+) {
+  app.use(cors({credentials: true, origin: process.env.FRONTENDHOST}));
+} else {
+  app.use(cors());
+}
 // Easier to see what requests are sent via postman
 app.use(morgan('dev'));
 // Authenticate user
