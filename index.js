@@ -1,5 +1,5 @@
 require('dotenv').config();
-require('./auth/user.auth');
+require('./passport');
 
 const express = require('express');
 const mongoose = require('mongoose');
