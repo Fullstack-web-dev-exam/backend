@@ -4,6 +4,7 @@ const Joi = require('joi');
 const validateRequest = require('../middleware/validate-request');
 const authorize = require('../middleware/authorize');
 const auth = require('../controllers/auth.controller');
+const Role = require('../helpers/role');
 
 const router = express.Router();
 
