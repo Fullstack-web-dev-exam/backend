@@ -3,7 +3,7 @@ const express = require('express');
 const {
   sendPasswordResetEmail,
   recieveNewPassword,
-} = require('../controller/email.controller');
+} = require('../controllers/email.controller');
 
 const router = express.Router();
 
