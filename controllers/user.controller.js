@@ -1,4 +1,4 @@
-const UserModel = require('../model/user.model');
+const UserModel = require('../models/user.model');
 
 // Get user information based on role
 // Gardeners and Managers can get their on information (not password and id)
