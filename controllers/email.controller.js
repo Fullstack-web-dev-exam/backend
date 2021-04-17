@@ -6,7 +6,7 @@ const {
   getPasswordResetUrl,
   resetPasswordTemplate,
 } = require('../auth/email');
-const UserModel = require('../models/user.model');
+const UserModel = require('../models/User');
 
 const UsePasswordHashToMakeToken = ({
   password: passwordHash,
