@@ -10,27 +10,10 @@ const bcrypt = require('bcryptjs');
 const router = express.Router();
 
 /**
- * POST: User Login
- * req.body = email, password
- */
-router.post('/login', authenticateSchema, (req, res, next) => {
-  const { email, password } = req.body;
-  const ipAddress = req.ip;
-
-  authService
-    .authenticate({ email, password, ipAddress })
-    .then(({ refreshToken, ...user }) => {
-      setTokenCookie(res, refreshToken);
-      res.json({ user, refreshToken });
-    })
-    .catch(next);
-});
-
-/**
  * POST: User Register
  * req.body = email, password, role
  */
-router.post('/register', createSchema, async (req, res, next) => {
+ router.post('/register', createSchema, async (req, res, next) => {
   const userDetails = req.body;
 
   // Check if user already exists
@@ -51,6 +34,23 @@ router.post('/register', createSchema, async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+});
+
+/**
+ * POST: User Login
+ * req.body = email, password
+ */
+router.post('/login', authenticateSchema, (req, res, next) => {
+  const { email, password } = req.body;
+  const ipAddress = req.ip;
+
+  authService
+    .authenticate({ email, password, ipAddress })
+    .then(({ refreshToken, ...user }) => {
+      setTokenCookie(res, refreshToken);
+      res.json({ user, refreshToken });
+    })
+    .catch(next);
 });
 
 /**
