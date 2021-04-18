@@ -11,7 +11,7 @@ const app = express();
 
 // Route handlers
 const userRoute = require('./routes/user.routes');
-const dashboardRoute = require('./routes/dashboard.routes');
+//const dashboardRoute = require('./routes/dashboard.routes');
 const resetRoute = require('./routes/email.routes');
 const authRoute = require('./routes/auth.routes');
 
@@ -31,7 +31,7 @@ const hasRole = require('./middleware/role.middleware');
 
 app.use('/', authRoute);
 app.use('/users', authUser, hasRole.User, userRoute);
-app.use('/dashboard', authUser, hasRole.Manager, dashboardRoute);
+//app.use('/dashboard', authUser, hasRole.Manager, dashboardRoute);
 app.use('/reset_password', resetRoute);
 
 // Connect to DB

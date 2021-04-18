@@ -11,7 +11,6 @@ function validateRequest(req, next, schema) {
     console.log(error);
     // next(`Validation error: ${error.details.map(x => x.message).join(', ')}`);
   } else {
-    console.log("Validated");
     req.body = value;
 		next();
   }
