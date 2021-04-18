@@ -31,4 +31,5 @@ schema.set('toJSON', {
     }
 });
 
-module.exports = mongoose.model('RefreshToken', schema);
+const RefreshTokenModel = mongoose.model('RefreshToken', schema);
+module.exports = RefreshTokenModel;

@@ -30,18 +30,14 @@ passport.use(
     async (req, payload, done) => {
       try {
         // Find user specified in token
-				console.log(payload)
         const user = await UserModel.findById(payload.sub);
-				console.log(user)
-				// console.log(user)
         // if user doesn't exist, handle it
         if (!user) {
           return done(null, false);
         }
-
+				console.log(user)
         // Otherwise return user
         req.user = user;
-				console.log(user)
         done(null, user);
       } catch (error) {
         done(error, false);
@@ -67,7 +63,12 @@ passport.use(
         if (!validate)
           return done(null, false, {message: 'Wrong username and/or password'});
 
-        return done(null, user, {message: 'User logged in successfully'});
+				// const refreshtoken = generateRefreshToken(user, user.ipAddress);
+
+				//save refresh token
+				// await refreshtoken.save()
+
+				return done(null, user,  {message: 'User logged in successfully'});
       } catch (error) {
         return done(error);
       }

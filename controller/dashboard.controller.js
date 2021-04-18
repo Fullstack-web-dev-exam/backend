@@ -63,7 +63,7 @@ exports.createUser = async function (req, res, next) {
 // Manager can only delete users
 exports.deleteUser = function (req, res, next) {
   try {
-    const {email} = req.params;
+    const {email} = req.body;
     UserModel.findOneAndDelete(email).then(data => {
       if (!data) {
         return res
@@ -87,8 +87,8 @@ exports.updateUser = async (req, res, next) => {
   try {
     if (!req.body)
       return res.status(400).send({message: 'Data to update cannot be empty!'});
-
-    const currentUser = req.user.email;
+	
+    const currentUser = req.body.selectedUser;
 
     // Update user based on email
     await UserModel.findOneAndUpdate({email: currentUser}, req.body, {

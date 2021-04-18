@@ -5,25 +5,26 @@ const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUI = require('swagger-ui-express');
+const passport = require('passport')
 // const options = require('./swagger.yaml')
 require('dotenv').config();
 
-const options = {
-  definition: {
-    openapi: '3.0.3',
-    info: {
-      title: 'fullstack-exam',
-      version: '1.0.0',
-      description: 'A simple fullstack exam',
-    },
-    servers: [
-      {
-        url: 'https://locahost:5000',
-      },
-    ],
-  },
-  apis: ['./routes/*.js'],
-};
+// const options = {
+//   definition: {
+//     openapi: '3.0.3',
+//     info: {
+//       title: 'fullstack-exam',
+//       version: '1.0.0',
+//       description: 'A simple fullstack exam',
+//     },
+//     servers: [
+//       {
+//         url: 'https://locahost:5000',
+//       },
+//     ],
+//   },
+//   apis: ['./routes/*.js'],
+// };
 
 const specs = swaggerJsDoc(options);
 
@@ -49,14 +50,14 @@ app.use(morgan('dev'));
 
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(specs));
 // Authenticate user
-// const authUser = passport.authenticate('jwt', {session: false});
+const authUser = passport.authenticate('jwt', {session: false});
 const hasRole = require('./middleware/role.middleware');
 
 app.use('/', generalRoute);
 // app.use('/profile', profileRoute)
 app.use('/profile', hasRole.User, profileRoute);
 // app.use('/dashboard', authUser, hasRole.Manager, dashboardRoute);
-app.use('/dashboard', dashboardRoute);
+app.use('/dashboard', authUser, dashboardRoute);
 app.use('/forgotpassword', forgotPasswordRoute);
 
 // Database
