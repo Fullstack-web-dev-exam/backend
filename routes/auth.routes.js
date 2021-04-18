@@ -10,7 +10,7 @@ const router = express.Router();
 
 /**
  * POST: User Register
- * req.body = email, password, role
+ * req.body = name, surname, email, password, role
  */
 router.post('/register', registerSchema, auth.register);
 

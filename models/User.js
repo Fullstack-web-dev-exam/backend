@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-  /* TEMPORARY DISABLED FOR TESTING
   name: {
     type: 'string',
     require: true,
@@ -11,7 +10,7 @@ const userSchema = new mongoose.Schema({
     type: 'string',
     require: true,
     trim: true,
-  },*/
+  },
   role: {
     type: 'string',
     require: true,
