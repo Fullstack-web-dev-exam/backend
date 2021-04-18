@@ -1,5 +1,5 @@
 require('dotenv').config();
-require('./passport');
+require('./auth/user.auth');
 
 const express = require('express');
 const mongoose = require('mongoose');
@@ -16,7 +16,6 @@ const resetRoute = require('./routes/email.routes');
 const authRoute = require('./routes/auth.routes');
 
 // Middlewares
-
 // parse request of content-type - application/json
 app.use(express.json());
 // parse request of content-type - application/x-www-form-urlencoded
