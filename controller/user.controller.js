@@ -48,9 +48,9 @@ exports.createUser = async function (req, res, next) {
         password: req.body.password,
       });
 
-      await UserModel.exists({user}).then(data => {
+      await UserModel.exists({email: user.email}).then(data => {
         if (data) {
-          res.status(400).send({message: 'User already exists'});
+          res.status(400).json({message: 'User already exists'});
         } else {
           user
             .save(user)
