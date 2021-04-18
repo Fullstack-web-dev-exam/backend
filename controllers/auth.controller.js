@@ -10,7 +10,6 @@ const User = require('../models/User');
 
 exports.register = async (req, res, next) => {
   const userDetails = req.body;
-  console.log(userDetails);
 
   // Check if user already exists
   if (await User.findOne({ email: userDetails.email })) {
@@ -28,8 +27,7 @@ exports.register = async (req, res, next) => {
     const savedUser = await user.save();
     res.status(200).json({ message: 'User registered successfully!', savedUser })
   } catch (error) {
-    console.log(error);
-    next(error);
+    res.status(500).json({ message: 'There was an error creating the user', error });
   }
 }
 
@@ -61,7 +59,7 @@ exports.login = async (req, res, next) => {
       refreshToken: refreshToken.token
     });
   } catch (error) {
-    next(error);
+    res.status(500).json({ message: 'There was a server-side error with login', error });
   }
 }
 
@@ -89,8 +87,7 @@ exports.revokeToken = async (req, res, next) => {
       refreshToken: refreshToken.token
     });
   } catch (error) {
-    console.log(error);
-    next(error);
+    res.status(500).json({ message: 'There was an error revoking the token', error });
   }
 }
 
@@ -122,7 +119,7 @@ exports.refreshToken = async (req, res, next) => {
     });
 
   } catch (error) {
-    next(error);
+    res.status(500).json({message: 'There was an error creating a new refresh token', error});
   }
 }
 
