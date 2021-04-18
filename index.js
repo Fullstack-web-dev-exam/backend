@@ -50,7 +50,7 @@ mongoose
     useFindAndModify: false,
   })
   .then(() => {
-    console.log('Connection to databse established');
+    console.log('Connection to database established');
     // Set port, and listen for requests
     const {PORT} = process.env;
     app.listen(PORT, () => {
@@ -58,7 +58,7 @@ mongoose
     });
   })
   .catch(err => {
-    console.log("Couldn't connect to the databse", err);
+    console.log("Couldn't connect to the database", err);
     process.exit();
   });
 
