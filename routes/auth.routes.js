@@ -16,38 +16,20 @@ router.post('/login', authenticateSchema, auth.login);
 
 /**
  * POST: Revoke token
- * req.cookies = refreshToken || req.body = token
  */
-router.post('/revoke-token', authorize(), revokeTokenSchema, auth.revokeToken);
+router.post('/revoke-token', authorize(), auth.revokeToken);
 
 /**
  * POST: Refresh Token
- * req.cookies = refreshToken || req.body = token
  */
 router.post('/refresh-token', auth.refreshToken);
 
 module.exports = router;
 
-function registerSchema(req, res, next) {
-  const schema = Joi.object({
-    email: Joi.string().email().required(),
-    password: Joi.string().required(),
-    role: Joi.string().valid(Role.Manager, Role.Gardener).required(),
-  });
-  validateRequest(req, next, schema);
-}
-
 function authenticateSchema(req, res, next) {
-  const schema = Joi.object({
-    email: Joi.string().required(),
-    password: Joi.string().required(),
-  });
-  validateRequest(req, next, schema);
-}
-
-function revokeTokenSchema(req, res, next) {
-  const schema = Joi.object({
-    token: Joi.string().empty(''),
-  });
-  validateRequest(req, next, schema);
+    const schema = Joi.object({
+        email: Joi.string().required(),
+        password: Joi.string().required(),
+    });
+    validateRequest(req, next, schema);
 }
