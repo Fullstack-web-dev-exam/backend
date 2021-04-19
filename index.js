@@ -6,13 +6,13 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 const cors = require('cors');
 const morgan = require('morgan');
-const cookieParser = require('cookie-parser')
+const cookieParser = require('cookie-parser');
 
 const app = express();
 
 // Route handlers
-const userRoute = require('./routes/user.routes');
-//const dashboardRoute = require('./routes/dashboard.routes');
+// const userRoute = require('./routes/profile.routes');
+const dashboardRoute = require('./routes/dashboard.routes');
 const resetRoute = require('./routes/email.routes');
 const authRoute = require('./routes/auth.routes');
 
@@ -20,8 +20,9 @@ const authRoute = require('./routes/auth.routes');
 // parse request of content-type - application/json
 app.use(express.json());
 // parse request of content-type - application/x-www-form-urlencoded
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser())
+app.use(express.urlencoded({extended: true}));
+// read cookie information
+app.use(cookieParser());
 // Not whitelisted atm, this is for development purposes
 if (
   process.env &&
@@ -35,20 +36,27 @@ if (
 // Easier to see what requests are sent via postman
 app.use(morgan('dev'));
 // Authenticate user
-const authUser = passport.authenticate('jwt', { session: false });
+const authUser = passport.authenticate('jwt', {session: false});
 
 const hasRole = require('./middleware/role.middleware');
 
 app.use('/', authRoute);
-app.use('/users', authUser, hasRole.User, userRoute);
-//app.use('/dashboard', authUser, hasRole.Manager, dashboardRoute);
+// app.use('/profile', authUser, hasRole.User, userRoute);
+app.use('/dashboard', authUser, hasRole.Manager, dashboardRoute);
 app.use('/reset_password', resetRoute);
 
 // Connect to DB
 mongoose.connect(
   process.env.DATABASE_CONNECT_URI,
-  { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true, useFindAndModify: false },
-  () => { console.log('Connected to DB!'); }
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useCreateIndex: true,
+    useFindAndModify: false,
+  },
+  () => {
+    console.log('Connected to DB!');
+  }
 );
 
 // Start server
@@ -58,7 +66,7 @@ app.listen(port, () => {
 });
 
 // Handle errors.
-// app.use((err, req, res, next) => {
-//   res.status(err.status || 500);
-//   res.json({ error: err });
-// });
+app.use((err, req, res, next) => {
+  res.status(err.status || 500);
+  res.json({ error: err });
+});
