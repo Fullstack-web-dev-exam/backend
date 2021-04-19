@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 const cors = require('cors');
 const morgan = require('morgan');
+const cookieParser = require('cookie-parser')
 
 const app = express();
 
@@ -20,6 +21,7 @@ const authRoute = require('./routes/auth.routes');
 app.use(express.json());
 // parse request of content-type - application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser())
 // Not whitelisted atm, this is for development purposes
 if (
   process.env &&
