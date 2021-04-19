@@ -11,7 +11,7 @@ const cookieParser = require('cookie-parser');
 const app = express();
 
 // Route handlers
-// const userRoute = require('./routes/profile.routes');
+const userRoute = require('./routes/profile.routes');
 const dashboardRoute = require('./routes/dashboard.routes');
 const profileRoute = require('./routes/profile.routes');
 const resetRoute = require('./routes/email.routes');
@@ -42,7 +42,7 @@ const authUser = passport.authenticate('jwt', {session: false});
 const hasRole = require('./middleware/role.middleware');
 
 app.use('/', authRoute);
-// app.use('/profile', authUser, hasRole.User, userRoute);
+app.use('/profile', authUser, hasRole.User, userRoute);
 app.use('/dashboard', authUser, hasRole.Manager, dashboardRoute);
 app.use('/profile', authUser, hasRole.User, profileRoute);
 app.use('/reset_password', resetRoute);
@@ -70,5 +70,5 @@ app.listen(port, () => {
 // Handle errors.
 app.use((err, req, res, next) => {
   res.status(err.status || 500);
-  res.json({ error: err });
+  res.json({error: err});
 });
