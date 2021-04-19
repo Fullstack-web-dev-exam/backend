@@ -29,7 +29,7 @@ exports.login = async (req, res, next) => {
     await refreshToken.save();
 
     // Maybe better if frontend set cookies?
-    // setTokenCookie(res, refreshToken);
+    setTokenCookie(res, refreshToken);
     res.status(200).json({
       message: "User logged in successfully",
       user: user.email,
@@ -45,7 +45,7 @@ exports.revokeToken = async (req, res, next) => {
   // Accept token from request body or cookie
   const token = req.body.token || req.cookies.refreshToken;
   const ipAddress = req.ip;
-  console.log(token);
+  // console.log(token);
   if (!token) return res.status(400).json({ message: 'Token is required' });
 
   // Users can revoke their own token and Managers can revoke any tokens
@@ -88,7 +88,7 @@ exports.refreshToken = async (req, res, next) => {
     const jwtToken = generateJwtToken(user);
 
     // Maybe better if frontend set cookies?
-    // setTokenCookie(res, refreshToken);
+    setTokenCookie(res, refreshToken);
     res.status(200).json({
       message: "Token refreshed successfully",
       user: user.email,
@@ -123,7 +123,7 @@ async function getRefreshToken(token) {
 
 function generateJwtToken(user) {
   return jwt.sign({ _id: user.id }, process.env.TOKEN_SECRET, {
-    expiresIn: '1m',
+    expiresIn: '5m',
   });
 }
 

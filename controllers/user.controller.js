@@ -1,4 +1,5 @@
 const UserModel = require('../models/User');
+const bcrypt = require('bcrypt')
 
 // Get user information based on role
 // Gardeners and Managers can get their on information (not password and id)
@@ -40,14 +41,14 @@ exports.createUser = async function (req, res, next) {
         });
       }
 
-      const password = bcrypt.hashSync(req.body.password, 10);
+      const passwordHash = await bcrypt.hashSync(req.body.password, 10);
 
       const user = new UserModel({
         name: req.body.name,
         surname: req.body.surname,
         role: req.body.role,
         email: req.body.email,
-        password,
+				password: passwordHash,
       });
 
       await UserModel.exists({ email: user.email }).then(data => {
