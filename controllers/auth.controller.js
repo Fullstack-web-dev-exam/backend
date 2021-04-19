@@ -41,9 +41,9 @@ exports.login = async (req, res, next) => {
 
 exports.revokeToken = async (req, res, next) => {
   // Accept token from request body or cookie
-  const token = req.body.token || req.cookies.refreshToken;
+  const token = req.cookies.refreshToken || req.body.token;
   const ipAddress = req.ip;
-  // console.log(token);
+
   if (!token) return res.status(400).json({ message: 'Token is required' });
 
   // Users can revoke their own token and Managers can revoke any tokens
@@ -53,6 +53,7 @@ exports.revokeToken = async (req, res, next) => {
 
   try {
     const refreshToken = await getRefreshToken(token);
+		// console.log(refreshToken)
     refreshToken.revoked = Date.now();
     refreshToken.revokedByIp = ipAddress;
     await refreshToken.save();
@@ -60,7 +61,7 @@ exports.revokeToken = async (req, res, next) => {
     res.status(200).json({
       message: "Token revoked successfully",
       user: basicDetails(refreshToken.user),
-      refreshToken: refreshToken.token
+      // refreshToken: refreshToken.token
     });
   } catch (error) {
     res.status(500).json({ message: 'There was an error revoking the token', error });
