@@ -1,13 +1,12 @@
 const express = require('express');
-const { getUser, createUser, updateUser, deleteUser, getAllUsers} = require('../controllers/user.controller');
+const {createUser, updateUser, deleteUser, getAllUsers} = require('../controllers/dashboard.controller');
 
 const router = express.Router();
 
-router.get('/user', getUser);
 router.post('/', createUser); // Use register route instead?
+router.get('/', getAllUsers);
 router.patch('/', updateUser);
 router.delete('/', deleteUser);
 
-router.get('/', getAllUsers);
 
 module.exports = router;
