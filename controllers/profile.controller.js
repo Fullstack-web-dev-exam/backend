@@ -19,7 +19,7 @@ exports.updateUser = async (req, res) => {
   try {
     const user = req.user;
     const newUserDetails = req.body;
-    if (newUserDetails.password && newUserDetails.oldPassword) {
+    if (newUserDetails.oldPassword) {
       if (!bcrypt.compareSync(newUserDetails.oldPassword, user.password)) {
         return res.status(400).json({message: 'Incorrect password'});
       }
