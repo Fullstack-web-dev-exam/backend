@@ -8,12 +8,12 @@ exports.createUser = async function (req, res, next) {
     const { name, surname, role, email, password } = req.body;
     // validate field
     if (!name || !surname || !role || !email || !password) {
-      res.status(400).send({
+      return res.status(400).json({
         message: 'name, surname, role, email and password is required',
       });
     }
 
-    const passwordHash = await bcrypt.hashSync(req.body.password, 10);
+    const passwordHash = bcrypt.hashSync(req.body.password, 10);
 
     const user = new UserModel({
       name: req.body.name,
