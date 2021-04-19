@@ -9,12 +9,6 @@ const Role = require('../helpers/role');
 const router = express.Router();
 
 /**
- * POST: User Register
- * req.body = name, surname, email, password, role
- */
-router.post('/register', registerSchema, auth.register);
-
-/**
  * POST: User Login
  * req.body = email, password
  */
