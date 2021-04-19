@@ -13,17 +13,16 @@ exports.login = async (req, res, next) => {
   const { email, password } = req.body;
   const ipAddress = req.ip;
 
+	console.log(req.body)
+	
   const user = await User.findOne({ email });
-
-  console.log(user);
 
   if (
     !user ||
-    !bcrypt.compareSync(password, user.passwordHash)
+    !bcrypt.compareSync(password, user.password)
   ) {
-    throw 'Email or password is incorrect';
+    next('Email or password is incorrect');
   }
-
   try {
     const jwtToken = generateJwtToken(user);
     const refreshToken = generateRefreshToken(user, ipAddress);
