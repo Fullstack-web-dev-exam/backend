@@ -14,9 +14,11 @@ exports.login = async (req, res, next) => {
   const ipAddress = req.ip;
 
   const user = await User.findOne({ email });
+
+  console.log(user);
+
   if (
     !user ||
-    !user.isVerified ||
     !bcrypt.compareSync(password, user.passwordHash)
   ) {
     throw 'Email or password is incorrect';
