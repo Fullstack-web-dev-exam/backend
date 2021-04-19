@@ -1,4 +1,8 @@
-exports.getUser = function (req, res, next) {
+const bcrypt = require('bcryptjs');
+const User = require('../models/User');
+
+
+exports.getUser = (req, res) => {
     try {
         const user = req.user;
         res.status(200).json({
@@ -12,56 +16,27 @@ exports.getUser = function (req, res, next) {
     }
 };
 
-exports.updateUser = async (req, res, next) => {
-
-    /*
-    const userEmail = req.body.selectedUser;
-    const { password } = req.body;
-    const currentUser = req.user.email;
-    console.log(req.body);
+exports.updateUser = async (req, res) => {
     try {
-        if (req.body.place === 'dashboard') {
-            // update a user by its email
-            if (!req.body)
-                return res
-                    .status(400)
-                    .send({ message: 'Data to update cannot be empty!' });
+        const user = req.user;
+        const newUserDetails = req.body;
 
-            if (password)
-                return res.status(400).send({ message: 'Cannot update password' });
-
-            // Update user based on email
-            await UserModel.findOneAndUpdate({ email: userEmail }, req.body, {
-                useFindAndModify: false,
-            }).then(data => {
-                if (!data) {
-                    res.status(404).send({
-                        message: `Cannot update user with email=${userEmail}. Maybe the user was not found`,
-                    });
-                } else {
-                    res.status(200).send({ data });
-                }
-            });
-        } else {
-            if (req.body.email)
-                return res
-                    .status(400)
-                    .send({ message: 'Cannot update password or email' });
-
-            // Update user based on email
-            await UserModel.findOneAndUpdate({ email: currentUser }, req.body, {
-                useFindAndModify: false,
-            }).then(data => {
-                if (!data) {
-                    res.status(404).send({
-                        message: `Cannot update user with email=${currentUser}. Maybe the user was not found`,
-                    });
-                } else {
-                    res.status(200).send({ data });
-                }
-            });
+        if (!bcrypt.compareSync(newUserDetails.oldPassword, user.password)) {
+            return res.status(400).json({ message: 'Incorrect password' });
         }
+
+        const passwordHash = await bcrypt.hashSync(newUserDetails.password, 10);
+        const updatedUser = await User.updateOne(
+            { _id: user._id },
+            {
+                $set: {
+                    name: newUserDetails.name,
+                    surname: newUserDetails.surname,
+                    password: passwordHash
+                }
+            });
+        return res.status(200).json({ message: 'User updated successfully!' });
     } catch (error) {
-        next(error);
-    }*/
+        res.status(500).json({ message: 'Could not update user', error });
+    }
 };
