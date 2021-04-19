@@ -2,7 +2,7 @@ const UserModel = require('../models/User');
 const bcrypt = require('bcrypt')
 
 // Managers can only create new user
-// Garderns === Unauthorized
+// Gardener === Unauthorized
 exports.createUser = async function (req, res, next) {
   try {
       const { name, surname, role, email, password } = req.body;
@@ -34,7 +34,7 @@ exports.createUser = async function (req, res, next) {
             })
             .catch(err => {
               res.status(500).send({
-                message: err.message || 'Some error occured while saving user',
+                message: err.message || 'Some error occurred while saving user',
               });
             });
         }
@@ -46,7 +46,7 @@ exports.createUser = async function (req, res, next) {
 };
 
 // Manager can only delete users
-// Gardenrs === Unauthorized
+// Gardener === Unauthorized
 exports.deleteUser = function (req, res, next) {
   try {
     const currentUser = req.body.email;
