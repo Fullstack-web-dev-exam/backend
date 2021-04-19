@@ -42,21 +42,7 @@ app.use('/users', authUser, hasRole.User, userRoute);
 //app.use('/dashboard', authUser, hasRole.Manager, dashboardRoute);
 app.use('/reset_password', resetRoute);
 
-<<<<<<< HEAD
 // Connect to DB
-mongoose.connect(
-  process.env.DATABASE_CONNECT_URI,
-  { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true, useFindAndModify: false },
-  () => { console.log('Connected to DB!'); }
-);
-
-// Start server
-const port = process.env.PORT;
-app.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
-});
-=======
-// Database
 mongoose
   .connect(process.env.DATABASE_CONNECT_URI, {
     useNewUrlParser: true,
@@ -65,7 +51,7 @@ mongoose
     useFindAndModify: false,
   })
   .then(() => {
-    console.log('Connection to database established');
+    console.log('Connection to databse established');
     // Set port, and listen for requests
     const {PORT} = process.env;
     app.listen(PORT, () => {
@@ -73,10 +59,9 @@ mongoose
     });
   })
   .catch(err => {
-    console.log("Couldn't connect to the database", err);
+    console.log("Couldn't connect to the databse", err);
     process.exit();
   });
->>>>>>> 6966f1f1452fc24aa0b0092a4e1532b353202dda
 
 // Handle errors.
 app.use((err, req, res, next) => {
