@@ -24,7 +24,7 @@ const userSchema = new mongoose.Schema({
     trim: true,
     lowercase: true,
   },
-  passwordHash: {
+  password: {
     type: 'string',
     required: true,
   },
@@ -51,7 +51,7 @@ userSchema.set('toJson', {
   transform(doc, ret) {
     // remove these props when object is serialized
     delete ret._id;
-    delete ret.passwordHash;
+    delete ret.password;
   },
 });
 
