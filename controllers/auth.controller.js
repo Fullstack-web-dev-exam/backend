@@ -29,7 +29,7 @@ exports.login = async (req, res, next) => {
     await refreshToken.save();
 
     // Maybe better if frontend set cookies?
-    setTokenCookie(res, refreshToken);
+    setTokenCookie(res, refreshToken.token);
     res.status(200).json({
       message: "User logged in successfully",
       user: user.email,
@@ -88,7 +88,7 @@ exports.refreshToken = async (req, res, next) => {
     const jwtToken = generateJwtToken(user);
 
     // Maybe better if frontend set cookies?
-    setTokenCookie(res, refreshToken);
+    setTokenCookie(res, refreshToken.token);
     res.status(200).json({
       message: "Token refreshed successfully",
       user: user.email,
