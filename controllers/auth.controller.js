@@ -12,8 +12,6 @@ const User = require('../models/User');
 exports.login = async (req, res, next) => {
   const { email, password } = req.body;
   const ipAddress = req.ip;
-
-	console.log(req.body)
 	
   const user = await User.findOne({ email });
 
