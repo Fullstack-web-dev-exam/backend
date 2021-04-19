@@ -31,6 +31,7 @@ exports.login = async (req, res, next) => {
     res.status(200).json({
       message: "User logged in successfully",
       user: user.email,
+			role: user.role,
       jwtToken,
     });
   } catch (error) {

@@ -41,7 +41,7 @@ const authUser = passport.authenticate('jwt', {session: false});
 const hasRole = require('./middleware/role.middleware');
 
 app.use('/', authRoute);
-app.use('/profile', authUser, hasRole.User, userRoute);
+// app.use('/profile', authUser, hasRole.User, userRoute);
 app.use('/dashboard', authUser, hasRole.Manager, dashboardRoute);
 app.use('/reset_password', resetRoute);
 
