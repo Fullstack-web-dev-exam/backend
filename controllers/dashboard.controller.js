@@ -8,12 +8,12 @@ exports.createUser = async function (req, res, next) {
     const { name, surname, role, email, password } = req.body;
     // validate field
     if (!name || !surname || !role || !email || !password) {
-      res.status(400).send({
+      return res.status(400).json({
         message: 'name, surname, role, email and password is required',
       });
     }
 
-    const passwordHash = await bcrypt.hashSync(req.body.password, 10);
+    const passwordHash = bcrypt.hashSync(req.body.password, 10);
 
     const user = new UserModel({
       name: req.body.name,
@@ -33,8 +33,13 @@ exports.createUser = async function (req, res, next) {
             res.send(resData);
           })
           .catch(err => {
+<<<<<<< HEAD
             res.status(500).send({
               message: err.message || 'Some error occurred while saving user',
+=======
+            res.status(500).json({
+              message: err.message || 'Some error occured while saving user',
+>>>>>>> bf119205e784d007aa0d3b5255a22fa5c4e54a6d
             });
           });
       }
