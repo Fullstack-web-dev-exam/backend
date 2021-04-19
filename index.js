@@ -11,7 +11,7 @@ const cookieParser = require('cookie-parser');
 const app = express();
 
 // Route handlers
-const userRoute = require('./routes/profile.routes');
+// const userRoute = require('./routes/profile.routes');
 const dashboardRoute = require('./routes/dashboard.routes');
 const resetRoute = require('./routes/email.routes');
 const authRoute = require('./routes/auth.routes');
