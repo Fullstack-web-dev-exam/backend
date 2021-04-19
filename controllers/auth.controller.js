@@ -13,8 +13,6 @@ exports.login = async (req, res, next) => {
   const { email, password } = req.body;
   const ipAddress = req.ip;
 
-	console.log(req.body)
-	
   const user = await User.findOne({ email });
 
   if (
@@ -96,8 +94,6 @@ exports.refreshToken = async (req, res, next) => {
     res.status(500).json({message: 'There was an error creating a new refresh token', error});
   }
 }
-
-// TODO: Remember to create validateRequest
 
 // helper functions
 function setTokenCookie(res, token) {
