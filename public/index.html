@@ -6,53 +6,60 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Create a new password</title>
+  <style>
+    * {
+      font-family: sans-serif
+    }
+
+    .container {
+      max-width: 550px;
+      margin: 2% auto 0 auto;
+      -webkit-box-shadow: 0 3px 15px rgba(0, 0, 0, .2);
+      box-shadow: 0 3px 15px rgba(0, 0, 0, .2);
+      border-radius: 10px;
+      padding: 1em;
+      overflow: hidden
+    }
+
+    fieldset {
+      border: none
+    }
+
+    legend {
+      text-align: center;
+      font-size: 2em;
+      margin: .5em auto
+    }
+
+    input {
+      margin: 8px 0 24px;
+      font-size: 16px;
+      width: 100%
+    }
+
+    button {
+      color: #fff;
+      font-size: 1em;
+      font-weight: 700;
+      margin: 8px 0;
+      padding: .9em 0;
+      width: 100%;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      -webkit-transition: .3s;
+      -o-transition: .3s;
+      transition: .3s;
+      background-color: #2e7d32
+    }
+
+    button:hover {
+      -webkit-box-shadow: 0 0 .5em rgba(33, 33, 33, .3);
+      box-shadow: 0 0 .5em rgba(33, 33, 33, .3)
+    }
+  </style>
 </head>
-<style>
-  * {
-    font-family: sans-serif
-  }
-  .container {
-    max-width: 550px;
-    margin: 2% auto 0 auto;
-    -webkit-box-shadow: 0 3px 15px rgba(0, 0, 0, .2);
-    box-shadow: 0 3px 15px rgba(0, 0, 0, .2);
-    border-radius: 10px;
-    padding: 1em;
-    overflow: hidden
-  }
-  fieldset {
-    border: none
-  }
-  legend {
-    text-align: center;
-    font-size: 2em;
-    margin: .5em auto
-  }
-  input {
-    margin: 8px 0 24px;
-    font-size: 16px;
-    width: 100%
-  }
-  button {
-    color: #fff;
-    font-size: 1em;
-    font-weight: 700;
-    margin: 8px 0;
-    padding: .9em 0;
-    width: 100%;
-    border-radius: 10px;
-    border: none;
-    cursor: pointer;
-    -webkit-transition: .3s;
-    -o-transition: .3s;
-    transition: .3s;
-    background-color: #2e7d32
-  }
-  button:hover {
-    -webkit-box-shadow: 0 0 .5em rgba(33, 33, 33, .3);
-    box-shadow: 0 0 .5em rgba(33, 33, 33, .3)
-  }
-</style>
+
 <body>
   <h1>Reset password form</h1>
   <form class="container" name="resetPassword" onsubmit="return getParams(this)">
@@ -80,4 +87,5 @@
     }
   </script>
 </body>
+
 </html>
