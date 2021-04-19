@@ -27,14 +27,13 @@ exports.login = async (req, res, next) => {
     const jwtToken = generateJwtToken(user);
     const refreshToken = generateRefreshToken(user, ipAddress);
     await refreshToken.save();
-
+		
     // Maybe better if frontend set cookies?
-    setTokenCookie(res, refreshToken);
+    setTokenCookie(res, refreshToken.token);
     res.status(200).json({
       message: "User logged in successfully",
       user: user.email,
       jwtToken,
-      refreshToken: refreshToken.token
     });
   } catch (error) {
     res.status(500).json({ message: 'There was a server-side error with login', error });
@@ -69,11 +68,9 @@ exports.revokeToken = async (req, res, next) => {
   }
 }
 
-
 exports.refreshToken = async (req, res, next) => {
-  const token = req.body.token || req.cookies.refreshToken;
+  const token =  req.cookies.refreshToken;
   const ipAddress = req.ip;
-
   try {
     const refreshToken = await getRefreshToken(token);
     const { user } = refreshToken;
@@ -88,12 +85,11 @@ exports.refreshToken = async (req, res, next) => {
     const jwtToken = generateJwtToken(user);
 
     // Maybe better if frontend set cookies?
-    setTokenCookie(res, refreshToken);
+    setTokenCookie(res, newRefreshToken.token);
     res.status(200).json({
       message: "Token refreshed successfully",
       user: user.email,
       jwtToken,
-      refreshToken: newRefreshToken.token
     });
 
   } catch (error) {
@@ -110,7 +106,6 @@ function setTokenCookie(res, token) {
     httpOnly: true,
     expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     secure: false,
-    path: '/refresh-token'
   };
   res.cookie('refreshToken', token, cookieOptions);
 }
