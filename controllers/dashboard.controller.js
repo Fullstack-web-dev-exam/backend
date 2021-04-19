@@ -33,7 +33,6 @@ exports.createUser = async function (req, res, next) {
             res.send(resData);
           })
           .catch(err => {
-
             res.status(500).send({
               message: err.message || 'Some error occurred while saving user',
             });
