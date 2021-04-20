@@ -14,23 +14,20 @@ exports.login = async (req, res, next) => {
   const ipAddress = req.ip;
   const user = await User.findOne({ email });
 
-  if (
-    !user ||
-    !bcrypt.compareSync(password, user.password)
-  ) {
+  if (!user || !bcrypt.compareSync(password, user.password)) {
     next('Email or password is incorrect');
   }
+
   try {
     const jwtToken = generateJwtToken(user);
     const refreshToken = generateRefreshToken(user, ipAddress);
     await refreshToken.save();
-		
-    // Maybe better if frontend set cookies?
+
     setTokenCookie(res, refreshToken.token);
     res.status(200).json({
       message: "User logged in successfully",
       user: user.email,
-			role: user.role,
+      role: user.role,
       jwtToken,
     });
   } catch (error) {
@@ -52,15 +49,13 @@ exports.revokeToken = async (req, res, next) => {
 
   try {
     const refreshToken = await getRefreshToken(token);
-		// console.log(refreshToken)
     refreshToken.revoked = Date.now();
     refreshToken.revokedByIp = ipAddress;
     await refreshToken.save();
 
     res.status(200).json({
       message: "Token revoked successfully",
-      user: basicDetails(refreshToken.user),
-      // refreshToken: refreshToken.token
+      user: basicDetails(refreshToken.user)
     });
   } catch (error) {
     res.status(500).json({ message: 'There was an error revoking the token', error });
@@ -68,7 +63,7 @@ exports.revokeToken = async (req, res, next) => {
 }
 
 exports.refreshToken = async (req, res, next) => {
-  const token =  req.cookies.refreshToken;
+  const token = req.cookies.refreshToken;
   const ipAddress = req.ip;
   try {
     const refreshToken = await getRefreshToken(token);
@@ -83,7 +78,6 @@ exports.refreshToken = async (req, res, next) => {
 
     const jwtToken = generateJwtToken(user);
 
-    // Maybe better if frontend set cookies?
     setTokenCookie(res, newRefreshToken.token);
     res.status(200).json({
       message: "Token refreshed successfully",
@@ -92,7 +86,7 @@ exports.refreshToken = async (req, res, next) => {
     });
 
   } catch (error) {
-    res.status(500).json({message: 'There was an error creating a new refresh token', error});
+    res.status(500).json({ message: 'There was an error creating a new refresh token', error });
   }
 }
 
