@@ -1,7 +1,6 @@
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 
-
 exports.getUser = (req, res) => {
     try {
         const user = req.user;
@@ -21,12 +20,16 @@ exports.updateUser = async (req, res) => {
         const user = req.user;
         const newUserDetails = req.body;
 
+        if (!newUserDetails.name || !newUserDetails.surname || !newUserDetails.password || !newUserDetails.oldPassword) {
+            return res.status(400).json({ message: 'Request body requires name, surname, password and oldPassword' });
+        }
+
         if (!bcrypt.compareSync(newUserDetails.oldPassword, user.password)) {
             return res.status(400).json({ message: 'Incorrect password' });
         }
 
         const passwordHash = await bcrypt.hashSync(newUserDetails.password, 10);
-        const updatedUser = await User.updateOne(
+        await User.updateOne(
             { _id: user._id },
             {
                 $set: {
