@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 // Gardener === Unauthorized
 exports.createUser = async function (req, res, next) {
   try {
-    const { name, surname, role, email, password } = req.body;
+    const {name, surname, role, email, password} = req.body;
     // validate field
     if (!name || !surname || !role || !email || !password) {
       return res.status(400).json({
@@ -23,9 +23,9 @@ exports.createUser = async function (req, res, next) {
       password: passwordHash,
     });
 
-    await UserModel.exists({ email: user.email }).then(data => {
+    await UserModel.exists({email: user.email}).then(data => {
       if (data) {
-        res.status(400).json({ message: 'User already exists' });
+        res.status(400).json({message: 'User already exists'});
       } else {
         user
           .save(user)
@@ -33,8 +33,8 @@ exports.createUser = async function (req, res, next) {
             res.send(resData);
           })
           .catch(err => {
-            res.status(500).json({
-              message: err.message || 'Some error occured while saving user',
+            res.status(500).send({
+              message: err.message || 'Some error occurred while saving user',
             });
           });
       }
@@ -49,11 +49,11 @@ exports.createUser = async function (req, res, next) {
 exports.deleteUser = function (req, res, next) {
   try {
     const currentUser = req.body.email;
-    UserModel.findOneAndDelete({ email: currentUser }).then(data => {
+    UserModel.findOneAndDelete({email: currentUser}).then(data => {
       if (!data) {
         return res
           .status(400)
-          .send({ message: `User with email=${currentUser} was not found` });
+          .send({message: `User with email=${currentUser} was not found`});
       }
       res.status(200).send({
         message: `User with email=${currentUser} was deleted successfully`,
@@ -77,11 +77,11 @@ exports.getAllUsers = function (req, res, next) {
     ]);
 
     queryAll.exec(function (error, value) {
-      if (error) return next({ message: 'Error queryAll users' }, error);
+      if (error) return next({message: 'Error queryAll users'}, error);
       res.send(value);
     });
   } catch (error) {
-    next({ message: 'Not sure why?' }, error);
+    next({message: 'Not sure why?'}, error);
   }
 };
 
@@ -89,18 +89,18 @@ exports.getAllUsers = function (req, res, next) {
 // Gardeners can update user information (not id, email, password)
 exports.updateUser = async (req, res, next) => {
   const userEmail = req.body.selectedUser;
-  const { password } = req.body;
+  const {password} = req.body;
   const currentUser = req.user.email;
   try {
     // update a user by its email
     if (!req.body)
-      return res.status(400).send({ message: 'Data to update cannot be empty!' });
+      return res.status(400).send({message: 'Data to update cannot be empty!'});
 
     if (password)
-      return res.status(400).send({ message: 'Cannot update password' });
+      return res.status(400).send({message: 'Cannot update password'});
 
     // Update user based on email
-    await UserModel.findOneAndUpdate({ email: userEmail }, req.body, {
+    await UserModel.findOneAndUpdate({email: userEmail}, req.body, {
       useFindAndModify: false,
     }).then(data => {
       if (!data) {
@@ -108,15 +108,15 @@ exports.updateUser = async (req, res, next) => {
           message: `Cannot update user with email=${userEmail}. Maybe the user was not found`,
         });
       } else {
-        res.status(200).send({ data });
+        res.status(200).send({data});
       }
     });
 
     if (req.body.email)
-      return res.status(400).send({ message: 'Cannot update password or email' });
+      return res.status(400).send({message: 'Cannot update password or email'});
 
     // Update user based on email
-    await UserModel.findOneAndUpdate({ email: currentUser }, req.body, {
+    await UserModel.findOneAndUpdate({email: currentUser}, req.body, {
       useFindAndModify: false,
     }).then(data => {
       if (!data) {
@@ -124,7 +124,7 @@ exports.updateUser = async (req, res, next) => {
           message: `Cannot update user with email=${currentUser}. Maybe the user was not found`,
         });
       } else {
-        res.status(200).send({ data });
+        res.status(200).send({data});
       }
     });
   } catch (error) {
