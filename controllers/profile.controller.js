@@ -19,24 +19,30 @@ exports.updateUser = async (req, res) => {
     try {
         const user = req.user;
         const newUserDetails = req.body;
+        const updates = {};
 
-        if (!newUserDetails.name || !newUserDetails.surname || !newUserDetails.password || !newUserDetails.oldPassword) {
-            return res.status(400).json({ message: 'Request body requires name, surname, password and oldPassword' });
+        if (!newUserDetails.name && !newUserDetails.surname && !newUserDetails.password && !newUserDetails.oldPassword) {
+            return res.status(400).json({ message: 'You must specify what to update!' });
         }
 
-        if (!bcrypt.compareSync(newUserDetails.oldPassword, user.password)) {
-            return res.status(400).json({ message: 'Incorrect password' });
+        if (newUserDetails.name) { updates.name = newUserDetails.name; }
+        if (newUserDetails.surname) {
+            updates.surname = newUserDetails.surname;
         }
 
-        const passwordHash = await bcrypt.hashSync(newUserDetails.password, 10);
+        if (newUserDetails.oldPassword && newUserDetails.password) {
+            if (!bcrypt.compareSync(newUserDetails.oldPassword, user.password)) {
+                return res.status(400).json({ message: 'Incorrect password' });
+            } else {
+                const password = await bcrypt.hashSync(newUserDetails.password, 10);
+                updates.password = password;
+            }
+        }
+
         await User.updateOne(
             { _id: user._id },
             {
-                $set: {
-                    name: newUserDetails.name,
-                    surname: newUserDetails.surname,
-                    password: passwordHash
-                }
+                $set: updates
             });
         return res.status(200).json({ message: 'User updated successfully!' });
     } catch (error) {
