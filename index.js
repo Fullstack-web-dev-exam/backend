@@ -20,7 +20,7 @@ const authRoute = require('./routes/auth.routes');
 // parse request of content-type - application/json
 app.use(express.json());
 // parse request of content-type - application/x-www-form-urlencoded
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({extended: true}));
 // read cookie information
 app.use(cookieParser());
 // Not whitelisted atm, this is for development purposes
@@ -29,14 +29,14 @@ if (
   process.env.NODE_ENV &&
   process.env.NODE_ENV === 'production'
 ) {
-  app.use(cors({ credentials: true, origin: process.env.FRONTENDHOST }));
+  app.use(cors({credentials: true, origin: process.env.FRONTENDHOST}));
 } else {
   app.use(cors());
 }
 // Easier to see what requests are sent via postman
 app.use(morgan('dev'));
 // Authenticate user
-const authUser = passport.authenticate('jwt', { session: false });
+const authUser = passport.authenticate('jwt', {session: false});
 const hasRole = require('./middleware/role.middleware');
 
 app.use('/', authRoute);
@@ -45,16 +45,15 @@ app.use('/profile', authUser, hasRole.User, profileRoute);
 app.use('/reset_password', resetRoute);
 
 // Connect to DB
-mongoose.connect(process.env.DATABASE_CONNECT_URI,
-  {
+mongoose
+  .connect(process.env.DATABASE_CONNECT_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true,
     useFindAndModify: false,
   })
   .then(() => console.log('Connected to DB!'))
-  .catch((error) => console.log(error));
-
+  .catch(error => console.log(error));
 
 // Start server
 const port = process.env.PORT;
@@ -65,5 +64,5 @@ app.listen(port, () => {
 // Handle errors.
 app.use((err, req, res, next) => {
   res.status(err.status || 500);
-  res.json({ error: err });
+  res.json({error: err});
 });
