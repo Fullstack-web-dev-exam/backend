@@ -42,11 +42,11 @@ exports.revokeToken = async (req, res, next) => {
   const token = req.cookies.refreshToken || req.body.token;
   const ipAddress = req.ip;
 
-  if (!token) return res.status(400).json({message: 'Token is required'});
+  if (!token) return res.status(400).json({error: 'Token is required'});
 
   // Users can revoke their own token and Managers can revoke any tokens
   if (!req.user.ownsToken(token) && req.user.role !== Role.Manager) {
-    return res.status(401).json({message: 'Unauthorized'});
+    return res.status(401).json({error: 'Unauthorized'});
   }
 
   try {
