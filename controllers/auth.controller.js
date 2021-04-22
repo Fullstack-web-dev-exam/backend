@@ -34,7 +34,7 @@ exports.login = async (req, res) => {
   } catch (error) {
     res
       .status(500)
-      .json({message: 'There was a server-side error with login', error});
+      .json({error: 'There was a server-side error with login', error});
   }
 };
 
@@ -43,11 +43,11 @@ exports.revokeToken = async (req, res, next) => {
   const token = req.cookies.refreshToken || req.body.token;
   const ipAddress = req.ip;
 
-  if (!token) return res.status(400).json({message: 'Token is required'});
+  if (!token) return res.status(400).json({error: 'Token is required'});
 
   // Users can revoke their own token and Managers can revoke any tokens
   if (!req.user.ownsToken(token) && req.user.role !== Role.Manager) {
-    return res.status(401).json({message: 'Unauthorized'});
+    return res.status(401).json({error: 'Unauthorized'});
   }
 
   try {
@@ -63,7 +63,7 @@ exports.revokeToken = async (req, res, next) => {
   } catch (error) {
     res
       .status(500)
-      .json({message: 'There was an error revoking the token', error});
+      .json({error: 'There was an error revoking the token', error});
   }
 };
 
@@ -91,7 +91,7 @@ exports.refreshToken = async (req, res, next) => {
     });
   } catch (error) {
     res.status(500).json({
-      message: 'There was an error creating a new refresh token',
+      error: 'There was an error creating a new refresh token',
       error,
     });
   }

@@ -18,7 +18,7 @@ function authorize(roles = []) {
       const refreshToken = await RefreshToken.find({user: user.id});
 
       if (!user || (roles.length && !roles.includes(user.role))) {
-        return res.status(401).json({message: 'Unauthorized'});
+        return res.status(401).json({error: 'Unauthorized'});
       }
 
       req.user.role = user.role;

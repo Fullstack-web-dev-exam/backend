@@ -17,7 +17,7 @@ module.exports.Manager = (req, res, next) => {
 
 module.exports.User = (req, res, next) => {
   if (!req.user) {
-    next({message: 'You are not an user'});
+    next({error: 'You are not an user'});
   } else {
     next();
   }

@@ -11,7 +11,7 @@ exports.getUser = (req, res) => {
       role: user.role,
     });
   } catch (error) {
-    res.status(500).json({message: 'Could not get user', error});
+    res.status(500).json({error: 'Could not get user', error});
   }
 };
 
@@ -30,7 +30,7 @@ exports.updateUser = async (req, res) => {
       return res
         .status(400)
         .json({
-          message: 'You must specify what fields to update. Cannot be empty.',
+          error: 'You must specify what fields to update. Cannot be empty.',
         });
     }
 
@@ -44,7 +44,7 @@ exports.updateUser = async (req, res) => {
 
     if (newUserDetails.oldPassword && newUserDetails.password) {
       if (!bcrypt.compareSync(newUserDetails.oldPassword, user.password)) {
-        return res.status(400).json({message: 'Incorrect password provided'});
+        return res.status(400).json({error: 'Incorrect password provided'});
       } else {
         const password = await bcrypt.hashSync(newUserDetails.password, 10);
         updates.password = password;
@@ -59,6 +59,6 @@ exports.updateUser = async (req, res) => {
     );
     return res.status(200).json({message: 'User updated successfully'});
   } catch (error) {
-    res.status(500).json({message: 'Could not update user', error});
+    res.status(500).json({error: 'Could not update user', error});
   }
 };
