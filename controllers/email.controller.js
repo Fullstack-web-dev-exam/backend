@@ -29,9 +29,6 @@ exports.sendPasswordResetEmail = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-  if (user == null) {
-    return res.status(400).send({error: 'No user with that email'});
-  }
   const token = UsePasswordHashToMakeToken(user);
   const url = getPasswordResetUrl(user, token);
   const emailTemplate = resetPasswordTemplate(user, url);
