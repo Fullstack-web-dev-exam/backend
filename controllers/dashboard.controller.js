@@ -9,7 +9,7 @@ exports.createUser = async function (req, res, next) {
     // validate field
     if (!name || !surname || !role || !email || !password) {
       return res.status(400).json({
-        message: 'name, surname, role, email and password is required',
+        error: 'name, surname, role, email and password is required',
       });
     }
 
@@ -25,7 +25,7 @@ exports.createUser = async function (req, res, next) {
 
     await UserModel.exists({email: user.email}).then(data => {
       if (data) {
-        res.status(400).json({message: 'User already exists'});
+        res.status(400).json({error: 'User already exists'});
       } else {
         user
           .save(user)
@@ -39,15 +39,18 @@ exports.createUser = async function (req, res, next) {
             };
             res.status(200).send(response);
           })
-          .catch(err => {
+          .catch(error => {
             res.status(500).json({
-              message: err.message || 'Some error occurred while saving user',
+              message: 'Some error occurred while saving user',
+              error,
             });
           });
       }
     });
   } catch (error) {
-    next(error);
+    res
+      .status(500)
+      .send({message: 'internal server error when creating user', error});
   }
 };
 
@@ -60,14 +63,16 @@ exports.deleteUser = function (req, res, next) {
       if (!data) {
         return res
           .status(400)
-          .send({message: `User with email=${currentUser} was not found`});
+          .send({error: `User with email=${currentUser} was not found`});
       }
       res.status(200).send({
         message: `User with email=${currentUser} was deleted successfully`,
       });
     });
   } catch (error) {
-    next(error);
+    res
+      .status(500)
+      .send({message: 'internal server error when deleting user', error});
   }
 };
 
@@ -84,11 +89,12 @@ exports.getAllUsers = function (req, res, next) {
     ]);
 
     queryAll.exec(function (error, value) {
-      if (error) return res.status(400).json({message: 'Error querying users'});
+      if (error)
+        return res.status(400).json({message: 'Error querying users', error});
       res.status(200).send(value);
     });
   } catch (error) {
-    res.status(500).json({message: 'Could not get all users'}, error);
+    res.status(500).json({message: 'Could not get all users', error});
   }
 };
 
@@ -101,10 +107,10 @@ exports.updateUser = async (req, res, next) => {
   try {
     // update a user by its email
     if (!req.body)
-      return res.status(400).send({message: 'Data to update cannot be empty!'});
+      return res.status(400).send({error: 'Data to update cannot be empty!'});
 
     if (password)
-      return res.status(400).send({message: 'Cannot update password'});
+      return res.status(400).send({error: 'Cannot update password'});
 
     // Update user based on email
     await UserModel.findOneAndUpdate({email: userEmail}, req.body, {
@@ -112,7 +118,7 @@ exports.updateUser = async (req, res, next) => {
     }).then(data => {
       if (!data) {
         res.status(404).send({
-          message: `Cannot update user with email=${userEmail}. Maybe the user was not found`,
+          error: `Cannot update user with email=${userEmail}. Maybe the user was not found`,
         });
       } else {
         res.status(200).send({data});
@@ -120,7 +126,7 @@ exports.updateUser = async (req, res, next) => {
     });
 
     if (req.body.email)
-      return res.status(400).send({message: 'Cannot update password or email'});
+      return res.status(400).send({error: 'Cannot update password or email'});
 
     // Update user based on email
     await UserModel.findOneAndUpdate({email: currentUser}, req.body, {
@@ -128,13 +134,15 @@ exports.updateUser = async (req, res, next) => {
     }).then(data => {
       if (!data) {
         res.status(404).send({
-          message: `Cannot update user with email=${currentUser}. Maybe the user was not found`,
+          error: `Cannot update user with email=${currentUser}. Maybe the user was not found`,
         });
       } else {
         res.status(200).send({data});
       }
     });
   } catch (error) {
-    next(error);
+    res
+      .status(500)
+      .send({message: 'Internal server error when updating user', error});
   }
 };

@@ -27,11 +27,9 @@ exports.updateUser = async (req, res) => {
       !newUserDetails.password &&
       !newUserDetails.oldPassword
     ) {
-      return res
-        .status(400)
-        .json({
-          message: 'You must specify what fields to update. Cannot be empty.',
-        });
+      return res.status(400).json({
+        error: 'You must specify what fields to update. Cannot be empty.',
+      });
     }
 
     if (newUserDetails.name) {
@@ -44,7 +42,7 @@ exports.updateUser = async (req, res) => {
 
     if (newUserDetails.oldPassword && newUserDetails.password) {
       if (!bcrypt.compareSync(newUserDetails.oldPassword, user.password)) {
-        return res.status(400).json({message: 'Incorrect password provided'});
+        return res.status(400).json({error: 'Incorrect password provided'});
       } else {
         const password = await bcrypt.hashSync(newUserDetails.password, 10);
         updates.password = password;

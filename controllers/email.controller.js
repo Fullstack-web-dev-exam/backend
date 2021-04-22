@@ -27,15 +27,16 @@ exports.sendPasswordResetEmail = async (req, res) => {
   try {
     user = await UserModel.findOne({email}).exec();
   } catch (error) {
-    res.status(404).json({message: 'No user with that email'});
+    res.status(404).json({error: 'No user with that email'});
   }
   const token = UsePasswordHashToMakeToken(user);
   const url = getPasswordResetUrl(user, token);
   const emailTemplate = resetPasswordTemplate(user, url);
 
   const sendEmail = () => {
-    transporter.sendMail(emailTemplate, (err, info) => {
-      if (err) return res.status(500).json({message: 'Error sending mail'});
+    transporter.sendMail(emailTemplate, (error, info) => {
+      if (error)
+        return res.status(500).json({message: 'Error sending mail', error});
       res.send({message: 'Email sent'});
       console.log(`** Email Sent **`, info.response);
     });
@@ -59,7 +60,7 @@ exports.recieveNewPassword = async (req, res) => {
               if (err) return;
               UserModel.findOneAndUpdate({_id: userId}, {password: hash}).then(
                 () => {
-                  res.status(202).json({message: 'Password changed accepted'});
+                  res.status(202).json({error: 'Password changed accepted'});
                 }
               );
             });
@@ -67,9 +68,9 @@ exports.recieveNewPassword = async (req, res) => {
         }
       })
       .catch(() => {
-        res.status(404).json({message: 'invalid user'});
+        res.status(404).json({error: 'invalid user'});
       });
   } catch (error) {
-    throw new Error(error);
+    res.status(500).send({message: 'Error reciveing new password', error});
   }
 };
