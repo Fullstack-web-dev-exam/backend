@@ -21,13 +21,16 @@ const UsePasswordHashToMakeToken = ({
   return token;
 };
 
-exports.sendPasswordResetEmail = async (req, res) => {
+exports.sendPasswordResetEmail = async (req, res, next) => {
   const email = req.body.userEmail;
   let user;
   try {
     user = await UserModel.findOne({email}).exec();
   } catch (error) {
-    res.status(404).json({error: 'No user with that email'});
+    next(error);
+  }
+  if (user == null) {
+    return res.status(400).send({error: 'No user with that email'});
   }
   const token = UsePasswordHashToMakeToken(user);
   const url = getPasswordResetUrl(user, token);
