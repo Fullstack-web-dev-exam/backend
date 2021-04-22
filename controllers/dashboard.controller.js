@@ -39,7 +39,7 @@ exports.createUser = async function (req, res, next) {
             };
             res.status(200).send(response);
           })
-          .catch(err => {
+          .catch(error => {
             res.status(500).json({
               error: err.message || 'Some error occurred while saving user',
             });
@@ -47,7 +47,9 @@ exports.createUser = async function (req, res, next) {
       }
     });
   } catch (error) {
-    next(error);
+    res
+      .status(500)
+      .send({message: 'internal server error when creating user', error});
   }
 };
 
@@ -67,7 +69,9 @@ exports.deleteUser = function (req, res, next) {
       });
     });
   } catch (error) {
-    next(error);
+    res
+      .status(500)
+      .send({message: 'internal server error when deleting user', error});
   }
 };
 
@@ -135,6 +139,8 @@ exports.updateUser = async (req, res, next) => {
       }
     });
   } catch (error) {
-    next(error);
+    res
+      .status(500)
+      .send({message: 'Internal server error when updating user', error});
   }
 };

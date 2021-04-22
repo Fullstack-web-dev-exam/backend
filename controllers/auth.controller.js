@@ -115,7 +115,7 @@ async function getRefreshToken(token) {
 
 function generateJwtToken(user) {
   return jwt.sign({_id: user.id}, process.env.TOKEN_SECRET, {
-    expiresIn: '5m',
+    expiresIn: '15m',
   });
 }
 
