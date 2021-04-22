@@ -30,7 +30,14 @@ exports.createUser = async function (req, res, next) {
         user
           .save(user)
           .then(resData => {
-            res.send(resData);
+            console.log(resData);
+            const response = {
+              name: resData.name,
+              surname: resData.surname,
+              role: resData.role,
+              email: resData.email,
+            };
+            res.status(200).send(response);
           })
           .catch(err => {
             res.status(500).json({
