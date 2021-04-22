@@ -21,7 +21,7 @@ const UsePasswordHashToMakeToken = ({
   return token;
 };
 
-exports.sendPasswordResetEmail = async (req, res) => {
+exports.sendPasswordResetEmail = async (req, res, next) => {
   const email = req.body.userEmail;
   let user;
   try {
@@ -59,7 +59,7 @@ exports.recieveNewPassword = async (req, res) => {
               if (err) return;
               UserModel.findOneAndUpdate({_id: userId}, {password: hash}).then(
                 () => {
-                  res.status(202).json({message: 'Password changed accepted'});
+                  res.status(202).json({error: 'Password changed accepted'});
                 }
               );
             });
@@ -70,6 +70,6 @@ exports.recieveNewPassword = async (req, res) => {
         res.status(404).json({error: 'invalid user'});
       });
   } catch (error) {
-    throw new Error(error);
+    res.status(500).send({message: 'Error reciveing new password', error});
   }
 };

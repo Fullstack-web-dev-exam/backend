@@ -27,11 +27,9 @@ exports.updateUser = async (req, res) => {
       !newUserDetails.password &&
       !newUserDetails.oldPassword
     ) {
-      return res
-        .status(400)
-        .json({
-          error: 'You must specify what fields to update. Cannot be empty.',
-        });
+      return res.status(400).json({
+        error: 'You must specify what fields to update. Cannot be empty.',
+      });
     }
 
     if (newUserDetails.name) {
