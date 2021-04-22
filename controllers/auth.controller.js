@@ -16,7 +16,7 @@ exports.login = async (req, res) => {
   if (!user || !bcrypt.compareSync(password, user.password)) {
     return res
       .status(400)
-      .json({message: 'Wrong email and/or password. Please try again.'});
+      .json({error: 'Wrong email and/or password. Please try again.'});
   }
 
   try {
