@@ -27,7 +27,6 @@ exports.login = async (req, res) => {
     setTokenCookie(res, refreshToken.token);
     res.status(200).json({
       message: 'User logged in successfully',
-      // user: user.email,
       role: user.role,
       jwtToken,
     });
