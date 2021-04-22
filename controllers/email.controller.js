@@ -27,7 +27,7 @@ exports.sendPasswordResetEmail = async (req, res) => {
   try {
     user = await UserModel.findOne({email}).exec();
   } catch (error) {
-    res.status(404).json({message: 'No user with that email'});
+    res.status(404).json({error: 'No user with that email'});
   }
   const token = UsePasswordHashToMakeToken(user);
   const url = getPasswordResetUrl(user, token);
@@ -35,7 +35,7 @@ exports.sendPasswordResetEmail = async (req, res) => {
 
   const sendEmail = () => {
     transporter.sendMail(emailTemplate, (err, info) => {
-      if (err) return res.status(500).json({message: 'Error sending mail'});
+      if (err) return res.status(500).json({error: 'Error sending mail'});
       res.send({message: 'Email sent'});
       console.log(`** Email Sent **`, info.response);
     });
@@ -67,7 +67,7 @@ exports.recieveNewPassword = async (req, res) => {
         }
       })
       .catch(() => {
-        res.status(404).json({message: 'invalid user'});
+        res.status(404).json({error: 'invalid user'});
       });
   } catch (error) {
     throw new Error(error);
