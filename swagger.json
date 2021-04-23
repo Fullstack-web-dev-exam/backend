@@ -30,6 +30,10 @@
     {
       "name": "email",
       "description": "Email manager"
+    },
+    {
+      "name": "profile",
+      "description": "User profile"
     }
   ],
   "paths": {
@@ -39,7 +43,7 @@
           "authenticate"
         ],
         "summary": "User login",
-        "operationId": "updatePet",
+        "operationId": "userLogin",
         "requestBody": {
           "description": "User that wants to login",
           "content": {
@@ -87,17 +91,32 @@
           },
           "400": {
             "description": "Token is required",
-            "content": {}
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized",
-            "content": {}
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
           }
         },
         "x-codegen-request-body-name": "body",
         "security": [
           {
             "refresh_token": []
+          },
+          {
+            "jwt_token": []
           }
         ]
       }
@@ -116,13 +135,22 @@
           },
           "500": {
             "description": "There was an error creating a new refresh token",
-            "content": {}
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
           }
         },
         "x-codegen-request-body-name": "body",
         "security": [
           {
             "refresh_token": []
+          },
+          {
+            "jwt_token": []
           }
         ]
       }
@@ -152,16 +180,28 @@
           },
           "400": {
             "description": "User already exists",
-            "content": {}
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
           },
           "500": {
             "description": "Some error occurred while saving user",
-            "content": {}
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
           }
         },
         "security": [
           {
-            "refresh_token": []
+            "jwt_token": []
           }
         ]
       },
@@ -179,16 +219,28 @@
           },
           "400": {
             "description": "Error querying users",
-            "content": {}
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
           },
           "500": {
             "description": "Could not get all users",
-            "content": {}
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
           }
         },
         "security": [
           {
-            "refresh_token": []
+            "jwt_token": []
           }
         ]
       },
@@ -198,7 +250,7 @@
         ],
         "summary": "Update a user",
         "description": "Manager updates a user",
-        "operationId": "updateUser",
+        "operationId": "updateUserManager",
         "requestBody": {
           "description": "User to update",
           "content": {
@@ -225,16 +277,28 @@
           },
           "404": {
             "description": "Cannot update user with email=${currentUser}. Maybe the user was not found",
-            "content": {}
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal server error when updating user",
-            "content": {}
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
           }
         },
         "security": [
           {
-            "refresh_token": []
+            "jwt_token": []
           }
         ]
       },
@@ -250,6 +314,9 @@
           "content": {
             "application/json": {
               "schema": {
+                "required": [
+                  "email"
+                ],
                 "properties": {
                   "email": {
                     "type": "string",
@@ -262,21 +329,195 @@
         },
         "responses": {
           "200": {
-            "description": "Updated user result",
+            "description": "Email sent",
             "content": {}
           },
           "404": {
-            "description": "Cannot update user with email=${currentUser}. Maybe the user was not found",
-            "content": {}
+            "description": "No user with that email",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
           },
           "500": {
-            "description": "Internal server error when updating user",
-            "content": {}
+            "description": "Error sending mail",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
           }
         },
         "security": [
           {
-            "refresh_token": []
+            "jwt_token": []
+          }
+        ]
+      }
+    },
+    "/reset_password": {
+      "post": {
+        "tags": [
+          "email"
+        ],
+        "summary": "Send forgot password email",
+        "description": "Send a email to the user to reset the password",
+        "operationId": "forgotPasswordEmail",
+        "requestBody": {
+          "description": "Email of the user that forgot the password",
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "email"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "description": "User email"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User object",
+            "content": {}
+          },
+          "400": {
+            "description": "User already exists",
+            "content": {}
+          },
+          "500": {
+            "description": "Some error occurred while saving user",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/profile": {
+      "get": {
+        "tags": [
+          "profile"
+        ],
+        "summary": "Get user",
+        "description": "User gets profile information",
+        "operationId": "getUser",
+        "responses": {
+          "200": {
+            "description": "User",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "User firstname"
+                    },
+                    "surname": {
+                      "type": "string",
+                      "description": "User lastname"
+                    },
+                    "email": {
+                      "type": "string",
+                      "description": "User email"
+                    },
+                    "role": {
+                      "type": "string",
+                      "description": "User role"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Could not get user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "jwt_token": []
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "profile"
+        ],
+        "summary": "Update a user",
+        "description": "User updates its own information",
+        "operationId": "updateUser",
+        "requestBody": {
+          "description": "New user information",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "User firstname"
+                  },
+                  "surname": {
+                    "type": "string",
+                    "description": "User lastname"
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "User password"
+                  },
+                  "oldPassword": {
+                    "type": "string",
+                    "description": "User email"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User updated successfully",
+            "content": {}
+          },
+          "400": {
+            "description": "You must specify what fields to update. Cannot be empty.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Could not update user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "jwt_token": []
           }
         ]
       }
@@ -334,10 +575,10 @@
           }
         },
         "xml": {
-          "name": "Pet"
+          "name": "User"
         }
       },
-      "ApiResponse": {
+      "ApiResponseError": {
         "type": "object",
         "properties": {
           "error": {
@@ -347,6 +588,11 @@
       }
     },
     "securitySchemes": {
+      "jwt_token": {
+        "type": "apiKey",
+        "name": "jwtToken",
+        "in": "cookie"
+      },
       "refresh_token": {
         "type": "apiKey",
         "name": "refreshToken",
