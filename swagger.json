@@ -1,0 +1,357 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Final Exam API - Fullstack web development",
+    "description": "Description NodeJS server",
+    "termsOfService": "http://swagger.io/terms/",
+    "contact": {
+      "email": "apiteam@swagger.io"
+    },
+    "version": "1.0.0"
+  },
+  "externalDocs": {
+    "description": "Find out more about our service",
+    "url": "api-docs"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000/"
+    }
+  ],
+  "tags": [
+    {
+      "name": "authenticate",
+      "description": "Everything authentication"
+    },
+    {
+      "name": "dashboard",
+      "description": "Manager dashboard"
+    },
+    {
+      "name": "email",
+      "description": "Email manager"
+    }
+  ],
+  "paths": {
+    "/login": {
+      "post": {
+        "tags": [
+          "authenticate"
+        ],
+        "summary": "User login",
+        "operationId": "updatePet",
+        "requestBody": {
+          "description": "User that wants to login",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserLogin"
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/UserLogin"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "User logged in successfully",
+            "content": {}
+          },
+          "400": {
+            "description": "Wrong email and/or password. Please try again.",
+            "content": {}
+          },
+          "500": {
+            "description": "There was a server-side error with login",
+            "content": {}
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/revoke-token": {
+      "post": {
+        "tags": [
+          "authenticate"
+        ],
+        "summary": "Revoke token of user",
+        "operationId": "revokeToken",
+        "responses": {
+          "200": {
+            "description": "Token revoked successfully",
+            "content": {}
+          },
+          "400": {
+            "description": "Token is required",
+            "content": {}
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {}
+          }
+        },
+        "x-codegen-request-body-name": "body",
+        "security": [
+          {
+            "refresh_token": []
+          }
+        ]
+      }
+    },
+    "/refresh-token": {
+      "post": {
+        "tags": [
+          "authenticate"
+        ],
+        "summary": "Revoke token of user",
+        "operationId": "refreshToken",
+        "responses": {
+          "200": {
+            "description": "Token refreshed successfully",
+            "content": {}
+          },
+          "500": {
+            "description": "There was an error creating a new refresh token",
+            "content": {}
+          }
+        },
+        "x-codegen-request-body-name": "body",
+        "security": [
+          {
+            "refresh_token": []
+          }
+        ]
+      }
+    },
+    "/": {
+      "post": {
+        "tags": [
+          "dashboard"
+        ],
+        "summary": "Create a user",
+        "description": "User created by a manager",
+        "operationId": "createUser",
+        "requestBody": {
+          "description": "User that wants to login",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User object",
+            "content": {}
+          },
+          "400": {
+            "description": "User already exists",
+            "content": {}
+          },
+          "500": {
+            "description": "Some error occurred while saving user",
+            "content": {}
+          }
+        },
+        "security": [
+          {
+            "refresh_token": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "dashboard"
+        ],
+        "summary": "Get all users",
+        "description": "Manager gets all users",
+        "operationId": "getUsers",
+        "responses": {
+          "200": {
+            "description": "Users array",
+            "content": {}
+          },
+          "400": {
+            "description": "Error querying users",
+            "content": {}
+          },
+          "500": {
+            "description": "Could not get all users",
+            "content": {}
+          }
+        },
+        "security": [
+          {
+            "refresh_token": []
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "dashboard"
+        ],
+        "summary": "Update a user",
+        "description": "Manager updates a user",
+        "operationId": "updateUser",
+        "requestBody": {
+          "description": "User to update",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "selectedUser": {
+                    "type": "string",
+                    "description": "User email"
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "User password"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated user result",
+            "content": {}
+          },
+          "404": {
+            "description": "Cannot update user with email=${currentUser}. Maybe the user was not found",
+            "content": {}
+          },
+          "500": {
+            "description": "Internal server error when updating user",
+            "content": {}
+          }
+        },
+        "security": [
+          {
+            "refresh_token": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "dashboard"
+        ],
+        "summary": "Delete a user",
+        "description": "Manager deletes a user",
+        "operationId": "deleteUser",
+        "requestBody": {
+          "description": "User to delete",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "description": "User email"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated user result",
+            "content": {}
+          },
+          "404": {
+            "description": "Cannot update user with email=${currentUser}. Maybe the user was not found",
+            "content": {}
+          },
+          "500": {
+            "description": "Internal server error when updating user",
+            "content": {}
+          }
+        },
+        "security": [
+          {
+            "refresh_token": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "required": [
+          "name",
+          "surname",
+          "role",
+          "email",
+          "password"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "surname": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "description": "Which role the user has",
+            "enum": [
+              "manager",
+              "gardener"
+            ]
+          },
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        },
+        "xml": {
+          "name": "User"
+        }
+      },
+      "UserLogin": {
+        "required": [
+          "email",
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        },
+        "xml": {
+          "name": "Pet"
+        }
+      },
+      "ApiResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "refresh_token": {
+        "type": "apiKey",
+        "name": "refreshToken",
+        "in": "cookie"
+      }
+    }
+  }
+}
