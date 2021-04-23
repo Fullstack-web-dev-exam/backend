@@ -590,8 +590,8 @@
     "securitySchemes": {
       "jwt_token": {
         "type": "apiKey",
-        "name": "jwtToken",
-        "in": "cookie"
+        "name": "Authorization",
+        "in": "header"
       },
       "refresh_token": {
         "type": "apiKey",
