@@ -164,7 +164,7 @@
         "description": "User created by a manager",
         "operationId": "createUser",
         "requestBody": {
-          "description": "User that wants to login",
+          "description": "User to create",
           "content": {
             "application/json": {
               "schema": {
