@@ -15,33 +15,32 @@
   },
   "servers": [
     {
-      "url": "http://localhost:5000/"
+      "url": "http://localhost:5000/",
+      "description": "Local development server"
     }
   ],
   "tags": [
     {
-      "name": "authenticate",
+      "name": "Authenticate",
       "description": "Everything authentication"
     },
     {
-      "name": "dashboard",
+      "name": "Profile",
+      "description": "User profile"
+    },
+    {
+      "name": "Dashboard",
       "description": "Manager dashboard"
     },
     {
-      "name": "email",
+      "name": "Email",
       "description": "Email manager"
-    },
-    {
-      "name": "profile",
-      "description": "User profile"
     }
   ],
   "paths": {
     "/login": {
       "post": {
-        "tags": [
-          "authenticate"
-        ],
+        "tags": ["Authenticate"],
         "summary": "User login",
         "operationId": "userLogin",
         "requestBody": {
@@ -63,75 +62,126 @@
         "responses": {
           "200": {
             "description": "User logged in successfully",
-            "content": {}
+            "headers": {
+              "Set-Cookie": {
+                "description": "`refreshToken`",
+                "schema": {
+                  "type": "string",
+                  "example": "refreshToken=51872eca5efedcf424db4cf5afd16a9d00ad25b743a034c9c221afc85d18dcd5e4ad6e3f08607550; Path=/; Expires=Tue, 16 Jun 2020 09:14:17 GMT; HttpOnly"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "User logged inn successfully"
+                    },
+                    "user": {
+                      "type": "string",
+                      "example": "email"
+                    },
+                    "jwtToken": {
+                      "type": "string",
+                      "example": "tokenstring"
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
-            "description": "Wrong email and/or password. Please try again.",
-            "content": {}
+            "description": "Bad request, either wrong email and/or password. Please try again.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Wrong email and/or password. Please try again."
+                    }
+                  }
+                }
+              }
+            }
           },
           "500": {
-            "description": "There was a server-side error with login",
-            "content": {}
+            "description": "There was a server-side error with login.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "There was a server-side error with login"
+                    }
+                  }
+                }
+              }
+            }
           }
         },
         "x-codegen-request-body-name": "body"
       }
     },
-    "/revoke-token": {
+    "/refresh-token": {
       "post": {
-        "tags": [
-          "authenticate"
+        "tags": ["Authenticate"],
+        "summary": "Use a refresh token to generate a new JWT access token and a new refresh token",
+        "description": "The refresh token is sent and returned via cookies.",
+        "operationId": "refreshToken",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "refreshToken",
+            "description": "The `refreshToken` cookie",
+            "schema": {
+              "type": "string",
+              "example": "51872eca5efedcf424db4cf5afd16a9d00ad25b743a034c9c221afc85d18dcd5e4ad6e3f08607550"
+            }
+          }
         ],
-        "summary": "Revoke token of user",
-        "operationId": "revokeToken",
         "responses": {
           "200": {
-            "description": "Token revoked successfully",
-            "content": {}
-          },
-          "400": {
-            "description": "Token is required",
+            "description": "User details, a JWT access token and a new refresh token cookie",
+            "headers": {
+              "Set-Cookie": {
+                "description": "`refreshToken`",
+                "schema": {
+                  "type": "string",
+                  "example": "refreshToken=51872eca5efedcf424db4cf5afd16a9d00ad25b743a034c9c221afc85d18dcd5e4ad6e3f08607550; Path=/; Expires=Tue, 16 Jun 2020 09:14:17 GMT; HttpOnly"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApiResponseError"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Token refreshed successfully"
+                    },
+                    "user": {
+                      "type": "string",
+                      "example": "emailstring"
+                    },
+                    "jwtToken": {
+                      "type": "string",
+                      "example": "tokenstring"
+                    }
+                  }
                 }
               }
             }
           },
           "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseError"
-                }
-              }
-            }
-          }
-        },
-        "x-codegen-request-body-name": "body",
-        "security": [
-          {
-            "refresh_token": []
-          },
-          {
-            "jwt_token": []
-          }
-        ]
-      }
-    },
-    "/refresh-token": {
-      "post": {
-        "tags": [
-          "authenticate"
-        ],
-        "summary": "Revoke token of user",
-        "operationId": "refreshToken",
-        "responses": {
-          "200": {
-            "description": "Token refreshed successfully",
-            "content": {}
+            "$ref": "#/components/schemas/UnauthorizedError"
           },
           "500": {
             "description": "There was an error creating a new refresh token",
@@ -155,31 +205,18 @@
         ]
       }
     },
-    "/": {
+    "/revoke-token": {
       "post": {
-        "tags": [
-          "dashboard"
-        ],
-        "summary": "Create a user",
-        "description": "User created by a manager",
-        "operationId": "createUser",
-        "requestBody": {
-          "description": "User to create",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/User"
-              }
-            }
-          }
-        },
+        "tags": ["Authenticate"],
+        "summary": "Revoke token of user",
+        "operationId": "revokeToken",
         "responses": {
           "200": {
-            "description": "User object",
+            "description": "Token revoked successfully",
             "content": {}
           },
           "400": {
-            "description": "User already exists",
+            "description": "Token is required",
             "content": {
               "application/json": {
                 "schema": {
@@ -188,225 +225,24 @@
               }
             }
           },
-          "500": {
-            "description": "Some error occurred while saving user",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseError"
-                }
-              }
-            }
+          "401": {
+            "$ref": "#/components/schemas/UnauthorizedError"
           }
         },
+        "x-codegen-request-body-name": "body",
         "security": [
+          {
+            "refresh_token": []
+          },
           {
             "jwt_token": []
           }
         ]
-      },
-      "get": {
-        "tags": [
-          "dashboard"
-        ],
-        "summary": "Get all users",
-        "description": "Manager gets all users",
-        "operationId": "getUsers",
-        "responses": {
-          "200": {
-            "description": "Users array",
-            "content": {}
-          },
-          "400": {
-            "description": "Error querying users",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseError"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Could not get all users",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseError"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "jwt_token": []
-          }
-        ]
-      },
-      "patch": {
-        "tags": [
-          "dashboard"
-        ],
-        "summary": "Update a user",
-        "description": "Manager updates a user",
-        "operationId": "updateUserManager",
-        "requestBody": {
-          "description": "User to update",
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "selectedUser": {
-                    "type": "string",
-                    "description": "User email"
-                  },
-                  "password": {
-                    "type": "string",
-                    "description": "User password"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Updated user result",
-            "content": {}
-          },
-          "404": {
-            "description": "Cannot update user with email=${currentUser}. Maybe the user was not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseError"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error when updating user",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseError"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "jwt_token": []
-          }
-        ]
-      },
-      "delete": {
-        "tags": [
-          "dashboard"
-        ],
-        "summary": "Delete a user",
-        "description": "Manager deletes a user",
-        "operationId": "deleteUser",
-        "requestBody": {
-          "description": "User to delete",
-          "content": {
-            "application/json": {
-              "schema": {
-                "required": [
-                  "email"
-                ],
-                "properties": {
-                  "email": {
-                    "type": "string",
-                    "description": "User email"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Email sent",
-            "content": {}
-          },
-          "404": {
-            "description": "No user with that email",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseError"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Error sending mail",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseError"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "jwt_token": []
-          }
-        ]
-      }
-    },
-    "/reset_password": {
-      "post": {
-        "tags": [
-          "email"
-        ],
-        "summary": "Send forgot password email",
-        "description": "Send a email to the user to reset the password",
-        "operationId": "forgotPasswordEmail",
-        "requestBody": {
-          "description": "Email of the user that forgot the password",
-          "content": {
-            "application/json": {
-              "schema": {
-                "required": [
-                  "email"
-                ],
-                "properties": {
-                  "email": {
-                    "type": "string",
-                    "description": "User email"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "User object",
-            "content": {}
-          },
-          "400": {
-            "description": "User already exists",
-            "content": {}
-          },
-          "500": {
-            "description": "Some error occurred while saving user",
-            "content": {}
-          }
-        }
       }
     },
     "/profile": {
       "get": {
-        "tags": [
-          "profile"
-        ],
+        "tags": ["Profile"],
         "summary": "Get user",
         "description": "User gets profile information",
         "operationId": "getUser",
@@ -438,6 +274,9 @@
               }
             }
           },
+          "401": {
+            "$ref": "#/components/schemas/UnauthorizedError"
+          },
           "500": {
             "description": "Could not get user",
             "content": {
@@ -456,9 +295,7 @@
         ]
       },
       "patch": {
-        "tags": [
-          "profile"
-        ],
+        "tags": ["Profile"],
         "summary": "Update a user",
         "description": "User updates its own information",
         "operationId": "updateUser",
@@ -504,6 +341,9 @@
               }
             }
           },
+          "401": {
+            "$ref": "#/components/schemas/UnauthorizedError"
+          },
           "500": {
             "description": "Could not update user",
             "content": {
@@ -521,19 +361,258 @@
           }
         ]
       }
+    },
+    "/dashboard": {
+      "post": {
+        "tags": ["Dashboard"],
+        "summary": "Create a user",
+        "description": "User created by a manager",
+        "operationId": "createUser",
+        "requestBody": {
+          "description": "User to create",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User object",
+            "content": {}
+          },
+          "400": {
+            "description": "User already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/schemas/UnauthorizedError"
+          },
+          "500": {
+            "description": "Some error occurred while saving user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "jwt_token": []
+          }
+        ]
+      },
+      "get": {
+        "tags": ["Dashboard"],
+        "summary": "Get all users",
+        "description": "Manager gets all users",
+        "operationId": "getUsers",
+        "responses": {
+          "200": {
+            "description": "Users array",
+            "content": {}
+          },
+          "400": {
+            "description": "Error querying users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/schemas/UnauthorizedError"
+          },
+          "500": {
+            "description": "Could not get all users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "jwt_token": []
+          }
+        ]
+      },
+      "patch": {
+        "tags": ["Dashboard"],
+        "summary": "Update a user",
+        "description": "Manager updates a user",
+        "operationId": "updateUserManager",
+        "requestBody": {
+          "description": "User to update",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "selectedUser": {
+                    "type": "string",
+                    "description": "User email"
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "User password"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated user result",
+            "content": {}
+          },
+          "404": {
+            "description": "Cannot update user with email=${currentUser}. Maybe the user was not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/schemas/UnauthorizedError"
+          },
+          "500": {
+            "description": "Internal server error when updating user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "jwt_token": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": ["Dashboard"],
+        "summary": "Delete a user",
+        "description": "Manager deletes a user",
+        "operationId": "deleteUser",
+        "requestBody": {
+          "description": "User to delete",
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": ["email"],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "description": "User email"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Email sent",
+            "content": {}
+          },
+          "404": {
+            "description": "No user with that email",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/schemas/UnauthorizedError"
+          },
+          "500": {
+            "description": "Error sending mail",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "jwt_token": []
+          }
+        ]
+      }
+    },
+    "/reset_password": {
+      "post": {
+        "tags": ["Email"],
+        "summary": "Send forgot password email",
+        "description": "Send a email to the user to reset the password",
+        "operationId": "forgotPasswordEmail",
+        "requestBody": {
+          "description": "Email of the user that forgot the password",
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": ["email"],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "description": "User email"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User object",
+            "content": {}
+          },
+          "400": {
+            "description": "User already exists",
+            "content": {}
+          },
+          "500": {
+            "description": "Some error occurred while saving user",
+            "content": {}
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
       "User": {
         "type": "object",
-        "required": [
-          "name",
-          "surname",
-          "role",
-          "email",
-          "password"
-        ],
+        "required": ["name", "surname", "role", "email", "password"],
         "properties": {
           "name": {
             "type": "string"
@@ -544,10 +623,7 @@
           "role": {
             "type": "string",
             "description": "Which role the user has",
-            "enum": [
-              "manager",
-              "gardener"
-            ]
+            "enum": ["manager", "gardener"]
           },
           "email": {
             "type": "string"
@@ -561,10 +637,7 @@
         }
       },
       "UserLogin": {
-        "required": [
-          "email",
-          "password"
-        ],
+        "required": ["email", "password"],
         "type": "object",
         "properties": {
           "email": {
@@ -583,6 +656,22 @@
         "properties": {
           "error": {
             "type": "string"
+          }
+        }
+      },
+      "UnauthorizedError": {
+        "description": "Access token is missing or invalid, or the user does not have access to perform the action",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Unauthorized"
+                }
+              }
+            }
           }
         }
       }
