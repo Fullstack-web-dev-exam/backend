@@ -243,8 +243,8 @@
     "/profile": {
       "get": {
         "tags": ["Profile"],
-        "summary": "Get user",
-        "description": "User gets profile information",
+        "summary": "User get information about their own profile",
+        "description": "Name, surname, email, role is shown",
         "operationId": "getUser",
         "responses": {
           "200": {
@@ -296,8 +296,8 @@
       },
       "patch": {
         "tags": ["Profile"],
-        "summary": "Update a user",
-        "description": "User updates its own information",
+        "summary": "Users can update their own information",
+        "description": "User can update name, surname and password using old password and new password",
         "operationId": "updateUser",
         "requestBody": {
           "description": "New user information",
@@ -345,7 +345,7 @@
             "$ref": "#/components/schemas/UnauthorizedError"
           },
           "500": {
-            "description": "Could not update user",
+            "description": "Something went wrong when updating the user",
             "content": {
               "application/json": {
                 "schema": {
@@ -415,7 +415,7 @@
       },
       "get": {
         "tags": ["Dashboard"],
-        "summary": "Get all users",
+        "summary": "Get a list of all users",
         "description": "Manager gets all users",
         "operationId": "getUsers",
         "responses": {
