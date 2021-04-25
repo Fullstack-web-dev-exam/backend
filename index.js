@@ -66,7 +66,6 @@ app.listen(port, () => {
 });
 
 // Handle errors.
-app.use((err, req, res, next) => {
-  res.status(err.status || 500);
-  res.json({error: err});
+app.use((error, req, res, next) => {
+  res.status(error.status || 500).json({error});
 });

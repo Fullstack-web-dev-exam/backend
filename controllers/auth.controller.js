@@ -5,20 +5,24 @@ const crypto = require('crypto');
 
 // Local files
 const RefreshToken = require('../models/RefreshToken');
-const Role = require('../helpers/role');
 const User = require('../models/User');
 
+// User login with email and password
 exports.login = async (req, res) => {
   const {email, password} = req.body;
   const ipAddress = req.ip;
-  const user = await User.findOne({email});
 
+  const user = await User.findOne({email});
+  // If there is no user with email or the password does not match throw error
   if (!user || !bcrypt.compareSync(password, user.password)) {
     return res
       .status(400)
       .json({error: 'Wrong email and/or password. Please try again.'});
   }
 
+  // Generate JWT and Refresh token
+  // Set refreshtoken in cookie
+  // Return object with role and JWT token
   try {
     const jwtToken = generateJwtToken(user);
     const refreshToken = generateRefreshToken(user, ipAddress);
@@ -37,7 +41,7 @@ exports.login = async (req, res) => {
   }
 };
 
-exports.revokeToken = async (req, res, next) => {
+exports.revokeToken = async (req, res) => {
   // Accept token from request body or cookie
   const token = req.cookies.refreshToken || req.body.token;
   const ipAddress = req.ip;
@@ -45,10 +49,12 @@ exports.revokeToken = async (req, res, next) => {
   if (!token) return res.status(400).json({error: 'Token is required'});
 
   // Users can revoke their own token and Managers can revoke any tokens
-  if (!req.user.ownsToken(token) && req.user.role !== Role.Manager) {
+  if (!req.user.ownsToken(token) && req.user.role !== 'manager') {
     return res.status(401).json({error: 'Unauthorized'});
   }
 
+  // Get refreshtoken using helper function
+  // Set revoked information and save
   try {
     const refreshToken = await getRefreshToken(token);
     refreshToken.revoked = Date.now();
@@ -57,7 +63,7 @@ exports.revokeToken = async (req, res, next) => {
 
     res.status(200).json({
       message: 'Token revoked successfully',
-      user: basicDetails(refreshToken.user),
+      user: refreshToken.user.email,
     });
   } catch (error) {
     res
@@ -66,11 +72,17 @@ exports.revokeToken = async (req, res, next) => {
   }
 };
 
-exports.refreshToken = async (req, res, next) => {
+exports.refreshToken = async (req, res) => {
   const token = req.cookies.refreshToken;
   const ipAddress = req.ip;
+
+  // Generates refresh token using user information and ip address
+  // revokes old refresh token (if any)
+  // saves new and old refresh token
+  // Generates and returns new JWT token (valid for 15 minutes)
   try {
     const refreshToken = await getRefreshToken(token);
+    // destructure user out of refreshToken
     const {user} = refreshToken;
 
     const newRefreshToken = generateRefreshToken(user, ipAddress);
@@ -123,16 +135,11 @@ function generateRefreshToken(user, ipAddress) {
   return new RefreshToken({
     user: user.id,
     token: randomTokenString(),
-    expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
     createdByIp: ipAddress,
   });
 }
 
 function randomTokenString() {
-  return crypto.randomBytes(40).toString('hex');
-}
-
-function basicDetails(user) {
-  const {id, name, surname, email, role, created, updated, isVerified} = user;
-  return {id, name, surname, email, role, created, updated, isVerified};
+  return crypto.randomBytes(40).toString('hex'); // generates random hex string
 }
