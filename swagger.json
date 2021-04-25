@@ -795,9 +795,9 @@
     },
     "securitySchemes": {
       "jwt_token": {
-        "type": "apiKey",
-        "name": "Authorization",
-        "in": "header"
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
       },
       "refresh_token": {
         "type": "apiKey",
