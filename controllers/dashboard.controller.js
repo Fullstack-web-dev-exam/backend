@@ -1,85 +1,45 @@
 const UserModel = require('../models/User');
 const bcrypt = require('bcryptjs');
 
-// Managers can only create new user
-// Gardener === Unauthorized
-exports.createUser = async function (req, res, next) {
-  try {
-    const {name, surname, role, email, password} = req.body;
-    // validate field
-    if (!name || !surname || !role || !email || !password) {
-      return res.status(400).json({
-        error: 'name, surname, role, email and password is required',
-      });
-    }
-
-    const passwordHash = bcrypt.hashSync(req.body.password, 10);
-
-    const user = new UserModel({
-      name: req.body.name,
-      surname: req.body.surname,
-      role: req.body.role,
-      email: req.body.email,
-      password: passwordHash,
+// Managers can create users
+exports.createUser = async (req, res) => {
+  const {name, surname, role, email, password} = req.body;
+  // validate fields
+  if (!name || !surname || !role || !email || !password) {
+    return res.status(400).json({
+      error: 'name, surname, role, email and password is required',
     });
-
-    await UserModel.exists({email: user.email}).then(data => {
-      if (data) {
-        res.status(400).json({error: 'User already exists'});
-      } else {
-        user
-          .save(user)
-          .then(resData => {
-            console.log(resData);
-            const response = {
-              name: resData.name,
-              surname: resData.surname,
-              role: resData.role,
-              email: resData.email,
-            };
-            res.status(200).send(response);
-          })
-          .catch(error => {
-            res.status(500).json({
-              error: err.message || 'Some error occurred while saving user',
-            });
-          });
-      }
-    });
-  } catch (error) {
-    res
-      .status(500)
-      .send({message: 'internal server error when creating user', error});
   }
-};
 
-// Manager can only delete users
-// Gardener === Unauthorized
-exports.deleteUser = function (req, res, next) {
+  // Return 400 if user exists
+  const userExists = await UserModel.exists({email});
+  if (userExists) return res.status(400).json({error: 'User already exists'});
+
+  const passwordHash = bcrypt.hashSync(password, 10);
+
+  const user = new UserModel({
+    name,
+    surname,
+    role,
+    email,
+    password: passwordHash,
+  });
+
+  // Save new user to db
   try {
-    const currentUser = req.body.email;
-    UserModel.findOneAndDelete({email: currentUser}).then(data => {
-      if (!data) {
-        return res
-          .status(400)
-          .send({error: `User with email=${currentUser} was not found`});
-      }
-      res.status(200).send({
-        message: `User with email=${currentUser} was deleted successfully`,
-      });
-    });
+    await user.save();
+    res.status(200).json({name, surname, role, email});
   } catch (error) {
     res
       .status(500)
-      .send({message: 'internal server error when deleting user', error});
+      .json({error: 'internal server error when creating user', error});
   }
 };
 
 // Manager can only get all users information (not id, password)
-// Gardeners === Unauthorized
-exports.getAllUsers = function (req, res, next) {
+exports.getAllUsers = async (req, res) => {
   try {
-    const queryAll = UserModel.find({}, [
+    const allUsers = await UserModel.find({}, [
       'name',
       'surname',
       'email',
@@ -87,56 +47,32 @@ exports.getAllUsers = function (req, res, next) {
       '-_id',
     ]);
 
-    queryAll.exec(function (error, value) {
-      if (error) return res.status(400).json({error: 'Error querying users'});
-      res.status(200).send(value);
-    });
+    res.status(200).json(allUsers);
   } catch (error) {
     res.status(500).json({error: 'Could not get all users'}, error);
   }
 };
 
 // Manager can update user information (not id, password)
-// Gardeners can update user information (not id, email, password)
-exports.updateUser = async (req, res, next) => {
-  const userEmail = req.body.selectedUser;
-  const {password} = req.body;
-  const currentUser = req.user.email;
+exports.updateUser = async (req, res) => {
+  const email = req.body.selectedUser;
+  const password = req.body.password;
+  // status 400 if body is empty
+  if (!req.body) return res.status(400).send({error: 'Data to update cannot be empty!'});
+  // status 400 if password is in body
+  if (password) return res.status(400).send({error: 'Cannot update password'});
+  //check if user exists
+  const userExists = await UserModel.exists({email});
+  if (!userExists) return res.status(400).send({error: `Cannot find user with email ${email}`});
+
   try {
-    // update a user by its email
-    if (!req.body)
-      return res.status(400).send({error: 'Data to update cannot be empty!'});
-
-    if (password)
-      return res.status(400).send({error: 'Cannot update password'});
-
     // Update user based on email
-    await UserModel.findOneAndUpdate({email: userEmail}, req.body, {
-      useFindAndModify: false,
-    }).then(data => {
-      if (!data) {
-        res.status(404).send({
-          error: `Cannot update user with email=${userEmail}. Maybe the user was not found`,
-        });
-      } else {
-        res.status(200).send({data});
-      }
-    });
-
-    if (req.body.email)
-      return res.status(400).send({error: 'Cannot update password or email'});
-
-    // Update user based on email
-    await UserModel.findOneAndUpdate({email: currentUser}, req.body, {
-      useFindAndModify: false,
-    }).then(data => {
-      if (!data) {
-        res.status(404).send({
-          error: `Cannot update user with email=${currentUser}. Maybe the user was not found`,
-        });
-      } else {
-        res.status(200).send({data});
-      }
+    const updatedUser = await UserModel.findOneAndUpdate({email}, req.body, {useFindAndModify: false});
+    res.status(200).send({
+      name: updatedUser.name,
+      surname: updatedUser.surname,
+      email: updatedUser.email,
+      role: updatedUser.role
     });
   } catch (error) {
     res
@@ -144,3 +80,24 @@ exports.updateUser = async (req, res, next) => {
       .send({message: 'Internal server error when updating user', error});
   }
 };
+
+// Manager can only delete users
+exports.deleteUser = async (req, res) => {
+  const email = req.body.email;
+
+  // Check if user exists
+  const userExists = await UserModel.exists({email});
+  if (!userExists) return res.status(400).send({error: `Cannot find user with email ${email}`});
+
+  // Find user and delete using email
+  try {
+    await UserModel.findOneAndDelete({email});
+    res.status(200).send({
+        message: `User with email=${email} was deleted successfully`,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .send({message: 'Internal server error when deleting user', error});
+  }
+}
