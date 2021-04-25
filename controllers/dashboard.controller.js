@@ -1,5 +1,5 @@
 const UserModel = require('../models/User');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 // Managers can only create new user
 // Gardener === Unauthorized
