@@ -1,12 +1,3 @@
-// Currently not used
-module.exports.Gardener = (req, res, next) => {
-  if (req.user && req.user.role === 'gardener') {
-    next();
-  } else {
-    next({error: 'You are not a Gardener'});
-  }
-};
-
 module.exports.Manager = (req, res, next) => {
   if (req.user && req.user.role === 'manager') {
     next();
