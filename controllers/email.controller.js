@@ -66,7 +66,15 @@ exports.recieveNewPassword = async (req, res) => {
 
     await UserModel.findOneAndUpdate({_id: userId}, {password: hash});
 
-    return res.status(202).json({message: 'Password changed accepted'});
+    if (
+      process.env &&
+      process.env.NODE_ENV &&
+      process.env.NODE_ENV === 'production'
+    ) {
+      return res.redirect(`${process.env.FRONTENDHOST}/login`); // for production
+    } else {
+      return res.status(202).json({message: 'Password changed accepted'}); // for development
+    }
   } catch (error) {
     res.status(500).send({message: 'Error reciveing new password', error});
   }
