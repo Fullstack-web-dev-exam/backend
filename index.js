@@ -26,15 +26,15 @@ app.use(express.urlencoded({extended: true}));
 // read cookie information
 app.use(cookieParser());
 // Not whitelisted atm, this is for development purposes
-if (
+/* if (
   process.env &&
   process.env.NODE_ENV &&
   process.env.NODE_ENV === 'production'
 ) {
   app.use(cors({credentials: true, origin: process.env.FRONTENDHOST}));
-} else {
+} else { */
   app.use(cors());
-}
+/* } */
 // Easier to see what requests are sent via postman
 app.use(morgan('dev'));
 // Authenticate user
