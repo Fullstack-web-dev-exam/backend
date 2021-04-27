@@ -67,7 +67,7 @@ exports.updateUser = async (req, res) => {
   const userExists = await UserModel.exists({ email });
   if (!userExists) return res.status(400).send({ error: `Cannot find user with email ${email}` });
   // Check if new email is already in use
-  const newEmailExists = await UserModel.exists({ newEmail });
+  const newEmailExists = await UserModel.exists({ email: newEmail });
   if (newEmailExists) return res.status(400).send({ error: `Another user is already using the following email ${email}` });
 
   try {
