@@ -227,6 +227,16 @@
           },
           "401": {
             "$ref": "#/components/schemas/UnauthorizedError"
+          },
+          "500": {
+            "description": "There was an error revoking the token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseError"
+                }
+              }
+            }
           }
         },
         "x-codegen-request-body-name": "body",
@@ -300,7 +310,7 @@
         "description": "User can update name, surname and password using old password and new password",
         "operationId": "updateUser",
         "requestBody": {
-          "description": "New user information",
+          "description": "New user information, can update name, surname and/or password",
           "content": {
             "application/json": {
               "schema": {
@@ -332,7 +342,7 @@
             "content": {}
           },
           "400": {
-            "description": "You must specify what fields to update. Cannot be empty.",
+            "description": "Name, surname or password and oldPassword is needed || incorrect password provided",
             "content": {
               "application/json": {
                 "schema": {
@@ -366,7 +376,7 @@
       "post": {
         "tags": ["Dashboard"],
         "summary": "Create a user",
-        "description": "User created by a manager",
+        "description": "Manager can create a new user using name, surname, role, email and password",
         "operationId": "createUser",
         "requestBody": {
           "description": "User to create",
@@ -381,7 +391,27 @@
         "responses": {
           "200": {
             "description": "User object",
-            "content": {}
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "surname": {
+                      "type": "string"
+                    },
+                    "email": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "User already exists",
@@ -397,7 +427,7 @@
             "$ref": "#/components/schemas/UnauthorizedError"
           },
           "500": {
-            "description": "Some error occurred while saving user",
+            "description": "internal server error when creating user",
             "content": {
               "application/json": {
                 "schema": {
@@ -421,10 +451,33 @@
         "responses": {
           "200": {
             "description": "Users array",
-            "content": {}
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  },
+                  "example": [
+                    {
+                      "role": "manager",
+                      "name": "string",
+                      "surname": "string",
+                      "email": "string"
+                    },
+                    {
+                      "role": "gardener",
+                      "name": "string",
+                      "surname": "string",
+                      "email": "string"
+                    }
+                  ]
+                }
+              }
+            }
           },
           "400": {
-            "description": "Error querying users",
+            "description": "Error querying for users",
             "content": {
               "application/json": {
                 "schema": {
@@ -455,7 +508,7 @@
       },
       "patch": {
         "tags": ["Dashboard"],
-        "summary": "Update a user",
+        "summary": "Update another user",
         "description": "Manager updates a user",
         "operationId": "updateUserManager",
         "requestBody": {
@@ -480,10 +533,30 @@
         "responses": {
           "200": {
             "description": "Updated user result",
-            "content": {}
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "surname": {
+                      "type": "string"
+                    },
+                    "email": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
           },
-          "404": {
-            "description": "Cannot update user with email=${currentUser}. Maybe the user was not found",
+          "400": {
+            "description": "Cannot update user with email ${email}.",
             "content": {
               "application/json": {
                 "schema": {
@@ -535,11 +608,22 @@
         },
         "responses": {
           "200": {
-            "description": "Email sent",
-            "content": {}
+            "description": "User with email=${email} was deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
           },
-          "404": {
-            "description": "No user with that email",
+          "400": {
+            "description": "Cannot find user with email ${email}",
             "content": {
               "application/json": {
                 "schema": {
@@ -552,7 +636,7 @@
             "$ref": "#/components/schemas/UnauthorizedError"
           },
           "500": {
-            "description": "Error sending mail",
+            "description": "Internal server error when deleting user",
             "content": {
               "application/json": {
                 "schema": {
@@ -593,16 +677,34 @@
         },
         "responses": {
           "200": {
-            "description": "User object",
-            "content": {}
-          },
-          "400": {
-            "description": "User already exists",
-            "content": {}
+            "description": "Email sent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
           },
           "500": {
-            "description": "Some error occurred while saving user",
-            "content": {}
+            "description": "Error trying to send email",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -678,9 +780,9 @@
     },
     "securitySchemes": {
       "jwt_token": {
-        "type": "apiKey",
-        "name": "Authorization",
-        "in": "header"
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
       },
       "refresh_token": {
         "type": "apiKey",

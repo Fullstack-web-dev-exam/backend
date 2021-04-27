@@ -22,7 +22,7 @@ exports.sendPasswordResetEmail = async (req, res) => {
 
   // Checks if user with email is in db
   const user = await UserModel.findOne({email}).exec();
-  if (!user) return res.status(404).json({message: 'No user with that email'});
+  if (!user) return res.status(200).json({message: 'Email sent'}); // to prevent leaking information we send same as line 40
   // Uses helper function to create token using password and createdAt with 1 hour expiration date
   const token = UsePasswordHashToMakeToken(
     user.passwordHash,
