@@ -33,7 +33,7 @@ app.use(cookieParser());
 ) {
   app.use(cors({credentials: true, origin: process.env.FRONTENDHOST}));
 } else { */
-  app.use(cors());
+  app.use(cors(process.env.FRONTENDHOST));
 /* } */
 // Easier to see what requests are sent via postman
 app.use(morgan('dev'));
