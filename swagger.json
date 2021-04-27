@@ -691,21 +691,6 @@
               }
             }
           },
-          "404": {
-            "description": "No user with that email",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          },
           "500": {
             "description": "Error trying to send email",
             "content": {
