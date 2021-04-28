@@ -38,6 +38,7 @@ exports.login = async (req, res) => {
     res
       .status(500)
       .json({error: 'There was a server-side error with login', error});
+      console.log(error);
   }
 };
 
