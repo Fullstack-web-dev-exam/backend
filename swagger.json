@@ -17,6 +17,10 @@
     {
       "url": "http://localhost:5000/",
       "description": "Local development server"
+    },
+    {
+      "url": "https://fullstackwebproject.herokuapp.com/",
+      "description": "Heroku backend server"
     }
   ],
   "tags": [
