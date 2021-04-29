@@ -10,8 +10,17 @@ exports.transporter = nodemailer.createTransport({
   },
 });
 
-exports.getPasswordResetUrl = (user, token) =>
-  `http://localhost:5000/reset_password/reset/${user._id}/${token}`;
+if (
+  process.env &&
+  process.env.NODE_ENV &&
+  process.env.NODE_ENV === 'production'
+) {
+  exports.getPasswordResetUrl = (user, token) =>
+    `${process.env.FRONTENDHOST}/reset_password/reset/${user._id}/${token}`;
+} else {
+  exports.getPasswordResetUrl = (user, token) =>
+    `http://localhost:5000/reset_password/reset/${user._id}/${token}`;
+}
 
 exports.resetPasswordTemplate = (user, url) => {
   const from = process.env.EMAIL_LOGIN;
@@ -20,8 +29,10 @@ exports.resetPasswordTemplate = (user, url) => {
   const html = `
   <p>Hey ${user.name || user.email},</p>
   <p>This is a noreply email where you can reset password</p>
-  <a href=${url}>${url}</a>
   <p>URL will expire in one hour</p>
+  <a href=${url}>${url}</a>
+  <p>Best regards,</p>
+  <p>Fullstack project team</p>
   `;
   return {from, to, subject, html};
 };
