@@ -16,7 +16,7 @@ if (
   process.env.NODE_ENV === 'production'
 ) {
   exports.getPasswordResetUrl = (user, token) =>
-    `${process.env.FRONTENDHOST}/reset_password/reset/${user._id}/${token}`;
+    `https://fullstackwebproject.herokuapp.com/reset_password/reset/${user._id}/${token}`;
 } else {
   exports.getPasswordResetUrl = (user, token) =>
     `http://localhost:5000/reset_password/reset/${user._id}/${token}`;
