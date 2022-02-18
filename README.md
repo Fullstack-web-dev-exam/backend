@@ -3,7 +3,6 @@ IDG2100 Full-stack Web development
 Group 1
 
 ## Table of contents
-* [Dotenv file](#Dotenv-file)
 * [General info](#general-info)
 * [Setup](#setup)
 * [Features](#features)
