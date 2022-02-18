@@ -9,17 +9,6 @@ Group 1
 * [Features](#features)
 * [Status](#status)
 
-## Dotenv file
-```
-PORT=5000
-DATABASE_CONNECT_URI=*DATABASE URL*
-TOKEN_SECRET='SimpleTokenFinalProject1!'
-EMAIL_LOGIN=noreplyemailsenderhere@gmail.com
-EMAIL_PASSWORD=bJLLHaKcwPzu5g
-FRONTENDHOST='http://localhost:3000'
-NODE_ENV='production'
-```
-
 ## General info
 This repository is the front-end part of our Final Project for IDG2100 Full-stack Web development (Spring 2021) The project will be graded as an exam.
 
